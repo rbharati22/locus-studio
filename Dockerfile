@@ -1,7 +1,11 @@
 FROM python:3.11-slim
 
-# Install Manim system dependencies (FFmpeg, LaTeX)
+# Install Manim system dependencies (Compilers, Cairo, Pango, FFmpeg, LaTeX)
 RUN apt-get update && apt-get install -y \
+    build-essential \
+    pkg-config \
+    libcairo2-dev \
+    libpango1.0-dev \
     ffmpeg \
     texlive \
     texlive-latex-extra \
