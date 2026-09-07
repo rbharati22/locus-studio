@@ -265,7 +265,13 @@ async def serve_presenter():
 @app.get("/media_editor")
 async def serve_media_editor():
     return FileResponse(os.path.join(STATIC_DIR, "media_editor.html"))
+@app.get("/sw.js")
+async def serve_sw():
+    return FileResponse(os.path.join(STATIC_DIR, "sw.js"))
 
+@app.get("/manifest.json")
+async def serve_manifest():
+    return FileResponse(os.path.join(STATIC_DIR, "manifest.json"))
 @app.post("/api/ai/draft_outline", response_model=OutlineResponse)
 async def draft_outline(data: DraftOutlineRequest):
     user_prompt = f"""Draft a {data.slide_count}-slide lecture outline on the topic: '{data.topic}'.
