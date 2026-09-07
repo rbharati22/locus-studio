@@ -1,20 +1,17 @@
 {
   "name": "LOCUS Studio",
   "short_name": "LOCUS",
+  "id": "/present",
   "start_url": "/present",
   "display": "fullscreen",
   "background_color": "#051329",
   "theme_color": "#00E5FF",
   "icons": [
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/192px-Python-logo-notext.svg.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/512px-Python-logo-notext.svg.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/static/locus-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
