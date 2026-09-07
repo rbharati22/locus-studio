@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locus Studio - Media Asset Editor</title>
+    <link rel="stylesheet" href="/static/presentation.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
+    <style>
+        .media-layout { display: flex; height: 100vh; overflow: hidden; background: var(--bg-dark); }
+        .code-panel { width: 50%; display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+        .preview-panel { width: 50%; display: flex; flex-direction: column; background: #000; }
+        
+        #codeEditor { flex-grow: 1; width: 100%; font-size: 15px; }
+        
+        .toolbar { padding: 15px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; }
+        .ai-bar { padding: 15px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        .ai-bar input { flex-grow: 1; padding: 10px; background: var(--bg-dark); border: 1px solid var(--accent); color: white; border-radius: 4px; }
+        .btn { padding: 8px 15px; background: var(--accent); color: var(--bg-dark); font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: var(--accent-hover); color: white; }
+        .btn.secondary { background: var(--bg-dark); color: white; border: 1px solid var(--border); }
+        
+        #previewContainer { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+        #previewMedia { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        #consoleOutput { height: 200px; background: #0d1117; color: #ef4444; font-family: monospace; font-size: 12px; padding: 10px; overflow-y: auto; border-top: 1px solid var(--border); display: none; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="media-layout">
+        <!-- Left: Code & AI -->
+        <div class="code-panel">
+            <div class="toolbar">
+                <span id="assetTitle" style="font-weight: bold; color: var(--accent);">asset_name.py</span>
+                <span id="assetType" style="color: var(--text-muted); font-size: 12px; margin-left: 10px;">manim_python</span>
+                <div style="flex-grow: 1;"></div>
+                <button class="btn" onclick="renderCode()" id="renderBtn">▶ Run / Render</button>
+            </div>
+            
+            <div id="codeEditor"></div>
+            
+            <div class="ai-bar">
+                <input type="text" id="aiPrompt" placeholder="e.g., Change the parabola color to neon cyan or add a grid...">
+                <button class="btn" onclick="surgicallyEdit()" id="aiBtn">✨ Refine</button>
+            </div>
+        </div>
+
+        <!-- Right: Preview & Terminal -->
+        <div class="preview-panel">
+            <div id="previewContainer">
+                <div style="color: var(--text-muted);">Click Run to generate preview...</div>
+            </div>
+            <div id="consoleOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Ace Editor
+        const editor = ace.edit("codeEditor");
+        editor.setTheme("ace/theme/tomorrow_night_eighties");
+        
+        // Load data from the main builder window
+        let assetData = JSON.parse(localStorage.getItem('locusMediaAsset') || '{}');
+        
+        document.getElementById('assetTitle').innerText = assetData.filename || 'Untitled';
+        document.getElementById('assetType').innerText = assetData.script_type || 'code';
+        
+        if (assetData.script_type === 'html_canvas') {
+            editor.session.setMode("ace/mode/html");
+        } else {
+            editor.session.setMode("ace/mode/python");
+        }
+        
+        editor.setValue(assetData.code || '', -1);
+
+        async function renderCode() {
+            const btn = document.getElementById('renderBtn');
+            const consoleOut = document.getElementById('consoleOutput');
+            const preview = document.getElementById('previewContainer');
+            
+            btn.innerText = "⏳ Rendering...";
+            consoleOut.style.display = "none";
+            
+            assetData.code = editor.getValue();
+            
+            try {
+                const response = await fetch('/api/media/save_asset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(assetData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Success: Load the media into the preview panel
+                    preview.innerHTML = "";
+                    if (assetData.script_type === 'html_canvas') {
+                        preview.innerHTML = `<iframe src="${result.url}?t=${Date.now()}" style="width:100%; height:100%; border:none; background:white;"></iframe>`;
+                    } else {
+                        preview.innerHTML = `<video src="${result.url}?t=${Date.now()}" controls autoplay style="max-width:100%; max-height:100%;"></video>`;
+                    }
+                } else {
+                    // Fail: Show backend python traceback in the console panel
+                    consoleOut.style.display = "block";
+                    consoleOut.innerText = result.detail || "Unknown compilation error.";
+                    preview.innerHTML = `<div style="color: #ef4444;">Render Failed. Check terminal below.</div>`;
+                }
+            } catch (e) {
+                consoleOut.style.display = "block";
+                consoleOut.innerText = e.message;
+            } finally {
+                btn.innerText = "▶ Run / Render";
+            }
+        }
+
+        async function surgicallyEdit() {
+            const prompt = document.getElementById('aiPrompt').value;
+            if (!prompt) return;
+            
+            const btn = document.getElementById('aiBtn');
+            btn.innerText = "⏳ Thinking...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/ai/edit_media_code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        code: editor.getValue(),
+                        instruction: prompt,
+                        script_type: assetData.script_type
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    editor.setValue(result.modified_code, -1);
+                    document.getElementById('aiPrompt').value = "";
+                } else {
+                    alert("AI Edit failed.");
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                btn.innerText = "✨ Refine";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locus AI Presentation Studio</title>
+    
+    <!-- KaTeX for instantaneous Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <link rel="stylesheet" href="/static/presentation.css">
+</head>
+<body>
+    <!-- Top Compact Navbar -->
+    <header class="top-nav">
+        <div class="brand">Locus Studio</div>
+        <div class="controls">
+            <button onclick="promptAIGeneration()">✨ AI Draft Deck</button>
+            <button onclick="document.getElementById('fileUpload').click()">📁 Load JSON/PDF</button>
+            <input type="file" id="fileUpload" style="display: none;" onchange="handleFileUpload(event)">
+            <button onclick="toggleFloatingBlackboard()" class="accent-btn">⬛ Blackboard</button>
+        </div>
+    </header>
+
+    <div class="workspace-grid">
+        <!-- AI & Deck Sidebar -->
+        <aside class="sidebar">
+            <div class="panel">
+                <h3>Deck Structure</h3>
+                <ul id="slideList" class="slide-list">
+                    <!-- Slide thumbnails/titles injected here -->
+                </ul>
+            </div>
+            <div class="panel ai-panel">
+                <h3>AI Assistant</h3>
+                <textarea id="aiInstruction" placeholder="Ask AI to add a step, change a derivation, or explain a concept..."></textarea>
+                <button onclick="refineCurrentSlide()">Refine Current Slide</button>
+            </div>
+        </aside>
+
+        <!-- Main Presentation Stage -->
+        <main class="presentation-stage" id="presentationStage">
+            
+            <!-- Slide Container (Holds HTML/Math/Media) -->
+            <div id="slideContainer" class="slide-container">
+                <div class="placeholder-text">Load a deck or generate one with AI to begin.</div>
+            </div>
+
+            <!-- Ink Overlay (Sits directly on top of slide) -->
+            <canvas id="slideInkCanvas" class="ink-overlay"></canvas>
+
+            <!-- Navigation Controls (Bottom Center) -->
+            <div class="slide-nav">
+                <button onclick="prevStep()">◀</button>
+                <span id="slideCounter">0 / 0</span>
+                <button onclick="nextStep()">▶</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Floating Resizable Blackboard -->
+    <div id="floatingBlackboard" class="floating-blackboard">
+        <div id="bbHandle" class="bb-handle">
+            <span>🖐️ Virtual Blackboard</span>
+            <div class="bb-controls">
+                <button onclick="clearBlackboard()">🧽</button>
+                <button onclick="prevBoardPage()">◀</button>
+                <span id="bbPageIndicator">P1</span>
+                <button onclick="nextBoardPage()">▶</button>
+                <button onclick="toggleFloatingBlackboard()">✖</button>
+            </div>
+        </div>
+        <div id="bbScrollArea" class="bb-scroll-area">
+            <canvas id="boardInkCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/presentation_engine.js"></script>
+    <script src="/static/inking_blackboard.js"></script>
+</body>
+</html>

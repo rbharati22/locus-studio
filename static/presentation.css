@@ -1,0 +1,245 @@
+/* --- Locus Engine Cinematic Theme Variables --- */
+:root {
+    --bg-dark: #051329;       
+    --bg-panel: #020813;      
+    --accent: #00E5FF;        
+    --accent-hover: #0055FF;  
+    --text-main: #ffffff;
+    --text-muted: #8b9bb4;
+    --math-color: #00E5FF;
+    --border: #1A365D;        
+    
+    --strip-width: 200px;
+}
+
+body, html {
+    margin: 0; padding: 0; height: 100vh;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg-dark); color: var(--text-main);
+    overflow: hidden;
+    user-select: none; /* Disables text highlighting and the vertical text cursor */
+    -webkit-user-select: none; /* Safari/iOS support */
+    -webkit-tap-highlight-color: transparent; /* Removes the blue flash on touchscreens */
+}
+
+/* --- Cinematic Intro Overlay --- */
+.cinematic-intro {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg-dark); z-index: 500;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    transition: opacity 1s ease-in-out;
+}
+.cinematic-intro.hidden { opacity: 0; pointer-events: none; }
+.intro-title { font-size: 48px; font-weight: bold; color: white; margin-bottom: 10px; opacity: 0; transform: translateY(20px); transition: all 1s ease-out; }
+.intro-subtitle { font-size: 24px; color: var(--text-muted); opacity: 0; transform: translateY(20px); transition: all 1s ease-out 0.3s; }
+.cinematic-intro.show-text .intro-title, .cinematic-intro.show-text .intro-subtitle { opacity: 1; transform: translateY(0); }
+
+/* --- Permanent UI Scaffolding --- */
+.locus-top-bar { position: absolute; top: 3.0rem; left: 0; width: 100%; height: 2px; background: var(--border); z-index: 15; transform: scaleX(0); transform-origin: left; transition: transform 1s ease-in-out; }
+.locus-ticker { position: absolute; top: 1.2rem; left: 2.0rem; font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; z-index: 15; opacity: 0; transition: opacity 1s ease-in; }
+.locus-rings { position: absolute; top: 1.0rem; right: 2.0rem; width: 30px; height: 30px; z-index: 15; opacity: 0; transition: opacity 1s ease-in; }
+.ring { position: absolute; border-radius: 50%; border: 3px solid; width: 20px; height: 20px; }
+.ring.r1 { border-color: var(--accent); left: 0; }
+.ring.r2 { border-color: var(--accent-hover); left: 6px; }
+
+.scaffolding-active .locus-top-bar { transform: scaleX(1); }
+.scaffolding-active .locus-ticker { opacity: 1; }
+.scaffolding-active .locus-rings { opacity: 0.6; }
+
+/* --- Full Screen Slide Container (Flex Layout) --- */
+.slide-container {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: transparent;
+    display: flex;
+    flex-direction: row; 
+    align-items: stretch; 
+    padding: calc(3.0rem + 20px) 50px 20px 50px; 
+    box-sizing: border-box;
+    z-index: 10;
+    overflow: hidden;
+}
+
+/* --- Theory Panel (Dynamically takes remaining space) --- */
+.slide-panel {
+    flex: 1; 
+    min-width: 0;              /* CRITICAL FIX: Allows Flexbox to shrink this panel below its max-content width */
+    position: relative;
+    overflow-y: auto;          /* Allows vertical scrolling for long derivations */
+    overflow-x: hidden; 
+    display: flex;             /* Upgraded to flex container */
+    justify-content: center;   /* Locks the canvas perfectly in the center */
+    align-items: flex-start;   /* Anchors canvas to the top */
+    scrollbar-width: none;     /* Hides scrollbar for cinematic look */
+}
+
+.slide-panel::-webkit-scrollbar {
+    display: none;
+}
+
+/* --- Manim-Style Theory Scaling Canvas --- */
+.theory-inner-canvas {
+    width: 100%;               /* Dynamically match the shrinking theory panel */
+    flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+/* --- The Visual Panel --- */
+.media-preview-panel {
+    position: relative; 
+    width: 0px; 
+    min-width: 0px; /* CRITICAL FIX: Forces a valid starting point for the width animation */
+    height: calc(100% - 4cm); 
+    margin-top: 2cm; 
+    margin-bottom: 2cm;
+    background: var(--bg-panel); 
+    border-left: none; 
+    z-index: 1003;
+    flex-shrink: 0; 
+    transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 8px;
+    overflow: hidden; 
+}
+.media-preview-panel.open {
+    border-left: 2px solid var(--border); /* Shows border only when open */
+}
+
+.media-fs-btn {
+    position: absolute; bottom: 15px; right: 15px; z-index: 1010;
+    background: rgba(2, 8, 19, 0.7); backdrop-filter: blur(4px);
+    color: white; border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 18px;
+    transition: 0.2s;
+}
+.media-fs-btn:hover { background: var(--accent); color: var(--bg-dark); }
+
+.media-embed { 
+    position: absolute; top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    border: none; border-radius: 8px; 
+    object-fit: contain; 
+}
+
+/* The Draggable Partition Line */
+.drawer-resizer {
+    position: absolute;
+    left: -6px; top: 0;
+    width: 12px; height: 100%;
+    cursor: col-resize; z-index: 1006;
+}
+.drawer-resizer:hover { background: rgba(0, 229, 255, 0.2); }
+
+/* --- 3-State Drawer Controls --- */
+.drawer-toggle-btn {
+    position: absolute; right: 0; top: calc(3.0rem + 2cm + 20px);
+    width: 18px; height: 60px; 
+    background: rgba(5, 19, 41, 0.6); backdrop-filter: blur(4px);
+    color: var(--text-muted); border: 1px solid var(--border); border-right: none;
+    border-radius: 6px 0 0 6px; cursor: pointer; z-index: 1005;
+    display: flex; align-items: center; justify-content: center;
+    transition: right 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.drawer-toggle-btn:hover { background: rgba(0, 229, 255, 0.3); color: white; }
+
+.media-strip {
+    position: absolute; right: 0; top: calc(3.0rem + 2cm + 20px);
+    width: var(--strip-width); height: auto; max-height: 80%;
+    background: rgba(2, 8, 19, 0.95); backdrop-filter: blur(12px);
+    border: 1px solid var(--border); border-right: none; border-radius: 8px 0 0 8px;
+    padding: 8px; z-index: 1004; display: flex; flex-direction: column; gap: 5px;
+    transform: translateX(100%); opacity: 0; pointer-events: none;
+    transition: transform 0.4s ease, opacity 0.3s;
+}
+.media-strip.open { transform: translateX(0); opacity: 1; pointer-events: auto; }
+
+.media-list-item {
+    background: var(--bg-dark); padding: 8px 12px; border: 1px solid transparent; border-radius: 4px; cursor: pointer;
+    font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.media-list-item:hover, .media-list-item.active { background: rgba(0, 229, 255, 0.15); color: white; border-color: var(--accent); }
+
+/* --- Cinematic Fade & Slide Reveal (Multi-Line Safe) --- */
+.theory-inner-canvas h2 {
+    scale: var(--geom-scale, 1);
+    transform-origin: center center;
+}
+
+.fragment { 
+    opacity: 0; 
+    translate: 0 12px;
+    scale: var(--geom-scale, 1);
+    transform-origin: center center;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), translate 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fragment.visible { 
+    opacity: 1; 
+    translate: 0 0;
+}
+.fragment.no-anim { 
+    opacity: 1 !important; 
+    translate: 0 0 !important;
+    transition: none !important;
+}
+
+.theory-inner-canvas h2, .fragment {
+    width: max-content;        /* Allows text to sit naturally on its line */
+    max-width: 1000px;         /* Hard cap to prevent infinitely long single lines */
+    box-sizing: border-box;
+    flex-shrink: 0;            /* Absolutely prevents text from rearranging/wrapping */
+    transform-origin: center center;
+}
+.fragment.math-block { color: var(--math-color); font-size: 34px; padding: 15px 0; margin: 0; text-align: center; }
+.fragment.text-block { color: var(--text-main); font-size: 26px; line-height: 1.4; padding: 8px 0; margin-bottom: 0; text-align: center; }
+.slide-nav { display: none; }
+.ink-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; touch-action: none; pointer-events: none; }
+
+/* --- Left Slide Navigation Drawer --- */
+.nav-toggle-btn {
+    position: absolute; top: 12px; left: 15px; z-index: 1006; background: transparent; 
+    border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; transition: 0.2s;
+}
+.nav-toggle-btn:hover { color: white; }
+
+.slide-nav-drawer {
+    position: absolute; left: 0; top: 0; height: 100%; width: 280px;
+    background: rgba(2, 8, 19, 0.98); backdrop-filter: blur(12px);
+    border-right: 1px solid var(--border); z-index: 1005;
+    transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; flex-direction: column; padding-top: 60px; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+}
+.slide-nav-drawer.open { transform: translateX(0); }
+
+.nav-drawer-header { padding: 0 20px 10px; font-weight: bold; color: var(--accent); border-bottom: 1px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.slide-nav-list { flex-grow: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px; scrollbar-width: none; }
+.slide-nav-list::-webkit-scrollbar { display: none; }
+
+.nav-item { padding: 12px; color: var(--text-muted); font-size: 14px; cursor: pointer; border-radius: 6px; border: 1px solid transparent; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-item:hover { background: rgba(0, 229, 255, 0.1); color: white; }
+.nav-item.active { background: rgba(0, 229, 255, 0.2); color: white; border-color: var(--accent); }
+
+/* Presenter Controls */
+.presenter-controls {
+    position: absolute; bottom: 20px; right: 20px; z-index: 100;
+    display: flex; gap: 10px; background: rgba(2, 8, 19, 0.85); padding: 8px; border-radius: 8px; border: 1px solid var(--border); backdrop-filter: blur(5px);
+}
+.presenter-controls button { background: transparent; border: none; color: white; cursor: pointer; font-size: 20px; padding: 5px 10px; transition: 0.2s; }
+.presenter-controls button:hover { color: var(--accent); }
+.editor-layout { background: #0f172a; } .top-nav { background: #1e293b; }
+
+/* --- Restored Floating Blackboard Styles --- */
+.floating-blackboard {
+    position: absolute; top: 50px; left: 300px; width: 600px; height: 400px;
+    background: rgba(2, 8, 19, 0.95); backdrop-filter: blur(12px);
+    border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+    display: none; flex-direction: column; resize: both; overflow: hidden; z-index: 100;
+}
+.bb-handle {
+    height: 30px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center;
+    padding: 0 10px; cursor: grab; border-bottom: 1px solid var(--border); touch-action: none; font-size: 12px; font-weight: bold;
+}
+.bb-controls button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; }
+.bb-controls button:hover { color: white; }
+.bb-scroll-area { flex-grow: 1; overflow: auto; width: 100%; height: 100%; background: transparent; }
+#boardInkCanvas { width: 2500px; height: 2500px; touch-action: none; }

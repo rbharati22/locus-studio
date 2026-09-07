@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>
+</head>
+<body>
+<canvas id="stage" width="800" height="600"></canvas>
+<script>
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+let currentStep = 1; const maxSteps = 4;
+const stepDescs = [
+  "Base Sample Space (Omega)",
+  "Measurable Event Subset A",
+  "Event B & Intersection (A and B)",
+  "Continuous Continuum Boundary"
+];
+let points = [];
+for(let i=0; i<250; i++) {
+  points.push({ x: 150 + Math.random()*500, y: 120 + Math.random()*360 });
+}
+
+function render() {
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(100, 100, 600, 400);
+  ctx.fillStyle = '#64748b';
+  ctx.font = '14px monospace';
+  ctx.fillText('Sample Space (Omega)', 610, 120);
+  
+  let insideA = 0, insideB = 0, insideBoth = 0;
+  points.forEach(p => {
+    const inA = Math.hypot(p.x - 330, p.y - 300) < 140;
+    const inB = Math.hypot(p.x - 470, p.y - 300) < 140;
+    if(inA) insideA++;
+    if(inB) insideB++;
+    if(inA && inB) insideBoth++;
+    
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+    if (currentStep === 1) ctx.fillStyle = '#00E5FF';
+    else if (currentStep === 2) ctx.fillStyle = inA ? '#fbbf24' : '#334155';
+    else if (currentStep >= 3) {
+      if(inA && inB) ctx.fillStyle = '#10b981';
+      else if(inA) ctx.fillStyle = '#fbbf24';
+      else if(inB) ctx.fillStyle = '#00E5FF';
+      else ctx.fillStyle = '#334155';
+    }
+    ctx.fill();
+  });
+  
+  if (currentStep >= 2) {
+    ctx.beginPath();
+    ctx.arc(330, 300, 140, 0, Math.PI*2);
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillText('Event A', 240, 180);
+  }
+  
+  if (currentStep >= 3) {
+    ctx.beginPath();
+    ctx.arc(470, 300, 140, 0, Math.PI*2);
+    ctx.strokeStyle = '#00E5FF';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = '#00E5FF';
+    ctx.fillText('Event B', 500, 180);
+  }
+  
+  if (currentStep === 4) {
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
+    ctx.beginPath();
+    ctx.arc(330, 300, 140, 0, Math.PI*2);
+    ctx.fill();
+  }
+  
+  // HUD Lines
+  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';
+  ctx.fillText('Sample Space & Event Subsets', 20, 30);
+  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';
+  ctx.fillText(`Step ${currentStep}/${maxSteps}: ${stepDescs[currentStep-1]}`, 20, 55);
+  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';
+  const probA = (insideA / points.length).toFixed(3);
+  ctx.fillText(`Points N=${points.length} | |A|=${insideA} | P(A)=${probA} | P(A and B)=${(insideBoth/points.length).toFixed(3)}`, 20, 80);
+  
+  // Footer
+  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';
+  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap to Advance]', 20, 580);
+}
+
+let startX, startY, startTime;
+window.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });
+window.addEventListener('pointerup', e => {
+  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {
+    if (e.clientX < window.innerWidth / 3) currentStep = Math.max(1, currentStep - 1);
+    else currentStep = Math.min(maxSteps, currentStep + 1);
+    render();
+  }
+});
+render();
+</script>
+</body>
+</html>

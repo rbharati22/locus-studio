@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<canvas id="stage" width="800" height="600"></canvas>
+<script>
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+
+let currentStep = 1;
+const maxSteps = 4;
+const stepDescriptions = [
+    "Initial network topology",
+    "Simulating link failures with probability p",
+    "Probability of at least one link failure",
+    "Formalizing uncertainty: Probability Space"
+];
+
+// --- Canvas & Projection Settings ---
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 600;
+const CENTER_X = CANVAS_WIDTH / 2;
+const CENTER_Y = CANVAS_HEIGHT / 2;
+const FOCAL_LENGTH = 300; // For perspective projection
+
+// --- 3D Scene Variables ---
+let nodes = [];
+let links = [];
+const NUM_NODES = 60; // Visualized nodes
+const NODE_RADIUS = 6;
+const P_VISUAL_FAILURE = 0.08; // Probability of link failure for visualization
+const SYSTEM_RADIUS = 180; // Radius of the sphere arrangement
+
+let yaw = 0.0;
+let pitch = 0.0;
+let drag = false;
+let lastX, lastY;
+
+// --- Node structure ---
+class Node {
+    constructor(id, x, y, z) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.projected = { x: 0, y: 0, scale: 0, z: 0 };
+    }
+
+    project() {
+        // Apply rotation
+        let rx = this.x, ry = this.y, rz = this.z;
+
+        // Rotate around Y-axis (yaw)
+        let temp_x = rx * Math.cos(yaw) + rz * Math.sin(yaw);
+        let temp_z = -rx * Math.sin(yaw) + rz * Math.cos(yaw);
+        rx = temp_x;
+        rz = temp_z;
+
+        // Rotate around X-axis (pitch)
+        let temp_y = ry * Math.cos(pitch) - rz * Math.sin(pitch);
+        temp_z = ry * Math.sin(pitch) + rz * Math.cos(pitch);
+        ry = temp_y;
+        rz = temp_z;
+
+        // Perspective projection
+        // Cap minimum depth to prevent infinite scaling (nodes too close to focal point)
+        const minZ = -FOCAL_LENGTH + 10; // Ensure z is always > minZ
+        const effectiveZ = Math.max(minZ, rz);
+        const scale = FOCAL_LENGTH / (FOCAL_LENGTH + effectiveZ);
+        this.projected.x = CENTER_X + rx * scale;
+        this.projected.y = CENTER_Y + ry * scale;
+        this.projected.scale = scale;
+        this.projected.z = effectiveZ; // Store for depth sorting
+    }
+
+    draw(ctx, isFailed = false) {
+        ctx.beginPath();
+        ctx.arc(this.projected.x, this.projected.y, NODE_RADIUS * this.projected.scale, 0, Math.PI * 2);
+        ctx.fillStyle = isFailed ? '#f43f5e' : '#00E5FF';
+        ctx.fill();
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1 * this.projected.scale;
+        ctx.stroke();
+    }
+}
+
+// --- Link structure ---
+class Link {
+    constructor(node1, node2) {
+        this.node1 = node1;
+        this.node2 = node2;
+        this.failed = false;
+        this.projected_z = 0; // Average Z for depth sorting
+    }
+
+    // Update projected_z after nodes are projected
+    updateProjectedZ() {
+        this.projected_z = (this.node1.projected.z + this.node2.projected.z) / 2;
+    }
+
+    draw(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(this.node1.projected.x, this.node1.projected.y);
+        ctx.lineTo(this.node2.projected.x, this.node2.projected.y);
+        ctx.strokeStyle = this.failed ? '#f43f5e' : '#10b981';
+        ctx.lineWidth = 2 * Math.min(this.node1.projected.scale, this.node2.projected.scale);
+        ctx.stroke();
+    }
+}
+
+function initNodesAndLinks() {
+    nodes = [];
+    links = [];
+    
+    // Arrange nodes on a sphere (Fibonacci sphere / golden spiral distribution)
+    for (let i = 0; i < NUM_NODES; i++) {
+        const phi = Math.acos(1 - (2 * i) / (NUM_NODES - 1)); // latitude
+        const theta = Math.PI * (1 + Math.sqrt(5)) * i; // longitude (golden angle)
+
+        const x = SYSTEM_RADIUS * Math.cos(theta) * Math.sin(phi);
+        const y = SYSTEM_RADIUS * Math.sin(theta) * Math.sin(phi);
+        const z = SYSTEM_RADIUS * Math.cos(phi);
+        nodes.push(new Node(i, x, y, z));
+    }
+
+    // Create a mesh-like structure by connecting to a few nearest neighbors
+    // This approximates a distributed system without a full mesh.
+    const connectionsPerNode = 4; 
+    const tempLinks = new Set(); // Use a Set to avoid duplicate links
+
+    for (let i = 0; i < NUM_NODES; i++) {
+        const currentNode = nodes[i];
+        const distances = [];
+        for (let j = 0; j < NUM_NODES; j++) {
+            if (i === j) continue;
+            const otherNode = nodes[j];
+            const dist = Math.sqrt(
+                (currentNode.x - otherNode.x)**2 +
+                (currentNode.y - otherNode.y)**2 +
+                (currentNode.z - otherNode.z)**2
+            );
+            distances.push({ node: otherNode, dist: dist });
+        }
+
+        distances.sort((a, b) => a.dist - b.dist);
+
+        for (let k = 0; k < Math.min(connectionsPerNode, distances.length); k++) {
+            const targetNode = distances[k].node;
+            const linkKey = `${Math.min(currentNode.id, targetNode.id)}-${Math.max(currentNode.id, targetNode.id)}`;
+            if (!tempLinks.has(linkKey)) {
+                links.push(new Link(currentNode, targetNode));
+                tempLinks.add(linkKey);
+            }
+        }
+    }
+}
+
+initNodesAndLinks(); // Initialize once
+
+// --- State Variables for Telemetry ---
+let failedLinkCount = 0;
+let probabilityOfAtLeastOneFailure = 0;
+
+function updateSimulationState() {
+    failedLinkCount = 0;
+    if (currentStep >= 2) {
+        for (const link of links) {
+            link.failed = Math.random() < P_VISUAL_FAILURE;
+            if (link.failed) {
+                failedLinkCount++;
+            }
+        }
+        // Calculate P(at least one link failure) for the *visualized* system
+        const totalLinks = links.length;
+        if (totalLinks > 0) {
+             probabilityOfAtLeastOneFailure = 1 - Math.pow((1 - P_VISUAL_FAILURE), totalLinks);
+        } else {
+             probabilityOfAtLeastOneFailure = 0;
+        }
+       
+    } else {
+        for (const link of links) {
+            link.failed = false;
+        }
+    }
+}
+
+function advanceToStep(step) {
+    currentStep = Math.max(1, Math.min(maxSteps, step));
+    updateSimulationState(); // Re-evaluate link failures on step change
+}
+
+// --- Animation Loop ---
+function animate() {
+    // Clear canvas
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Update and Project all nodes
+    for (const node of nodes) {
+        node.project();
+    }
+
+    // Update Z for links and prepare all renderable objects for depth sorting
+    let renderableObjects = [];
+    for (const node of nodes) {
+        renderableObjects.push({ type: 'node', obj: node, z: node.projected.z });
+    }
+    for (const link of links) {
+        link.updateProjectedZ();
+        renderableObjects.push({ type: 'link', obj: link, z: link.projected_z });
+    }
+
+    // Depth sort (Painter's Algorithm) - draw farthest first
+    renderableObjects.sort((a, b) => b.z - a.z); // Sort by Z, farthest (largest Z) first
+
+    // Draw objects
+    for (const item of renderableObjects) {
+        if (item.type === 'link') {
+            if (currentStep === 1) {
+                 // On step 1, all links are considered active for visualization
+                 // (even if updateSimulationState set some to failed, we override visually)
+                const originalFailedState = item.obj.failed;
+                item.obj.failed = false;
+                item.obj.draw(ctx);
+                item.obj.failed = originalFailedState; // Restore for next step
+            } else {
+                 item.obj.draw(ctx);
+            }
+        } else if (item.type === 'node') {
+            let isNodeInFailedLink = false;
+            if (currentStep >= 2) {
+                for (const link of links) {
+                    if (link.failed && (link.node1 === item.obj || link.node2 === item.obj)) {
+                        isNodeInFailedLink = true;
+                        break;
+                    }
+                }
+            }
+            item.obj.draw(ctx, isNodeInFailedLink && currentStep >= 2);
+        }
+    }
+
+    // --- HUD ---
+    ctx.fillStyle = '#00E5FF';
+    ctx.font = '16px monospace';
+    ctx.fillText('Uncertainty in Distributed Systems', 20, 30);
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = '14px monospace';
+    ctx.fillText(`Step ${currentStep}/${maxSteps}: ${stepDescriptions[currentStep - 1]}`, 20, 55);
+
+    ctx.fillStyle = '#10b981';
+    ctx.font = '14px monospace';
+    let telemetryText = `Nodes: ${NUM_NODES}, Links: ${links.length}`;
+    if (currentStep >= 2) {
+        telemetryText += `, p_visual: ${P_VISUAL_FAILURE.toFixed(3)}`;
+        telemetryText += `, Failed Links: ${failedLinkCount}`;
+    }
+    if (currentStep >= 3) {
+        telemetryText += `, P(at least 1 fail): ${(probabilityOfAtLeastOneFailure * 100).toFixed(3)}%`;
+    }
+    ctx.fillText(telemetryText, 20, 80);
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = '12px monospace';
+    ctx.fillText('Click Left: Prev Step | Click Right: Next Step | Drag: Orbit View', 20, 580);
+
+    requestAnimationFrame(animate);
+}
+
+// --- Event Listeners ---
+let startX, startY, startTime;
+window.addEventListener('pointerdown', e => {
+    startX = e.clientX;
+    startY = e.clientY;
+    startTime = Date.now();
+    drag = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+});
+
+window.addEventListener('pointermove', e => {
+    if (drag) {
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        yaw += dx * 0.005;
+        pitch -= dy * 0.005; // Invert for more intuitive vertical drag
+        
+        // Clamp pitch to prevent flipping
+        pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
+        
+        lastX = e.clientX;
+        lastY = e.clientY;
+    }
+});
+
+window.addEventListener('pointerup', e => {
+    drag = false;
+    if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {
+        if (e.clientX < window.innerWidth / 3) {
+            advanceToStep(currentStep - 1);
+        } else {
+            advanceToStep(currentStep + 1);
+        }
+    }
+});
+
+// Initial call to start the animation
+initNodesAndLinks();
+advanceToStep(1); // Set initial step and state
+animate();
+
+</script>
+</body>
+</html>

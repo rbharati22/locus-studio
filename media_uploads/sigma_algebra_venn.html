@@ -1,0 +1,367 @@
+<canvas id="stage" width="800" height="600"></canvas>
+<script>
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d');
+
+    const WIDTH = canvas.width;
+    const HEIGHT = canvas.height;
+    const BG_COLOR = '#0f172a';
+
+    let currentStep = 1;
+    const maxSteps = 4;
+
+    // Camera and Projection settings
+    let camera = {
+        x: 0,
+        y: 0,
+        z: -200, // Camera position in world space
+        focalLength: 500 // Distance from camera to projection plane
+    };
+    let rotation = {
+        x: Math.PI / 6, // Initial pitch
+        y: -Math.PI / 8 // Initial yaw
+    };
+
+    // Interaction state
+    let isDragging = false;
+    let lastPointerX, lastPointerY;
+    let startX, startY, startTime;
+
+    // Scene objects (world coordinates)
+    const worldObjects = [];
+
+    // --- Colors ---
+    const COLOR_PRIMARY = '#00E5FF';
+    const COLOR_SECONDARY = '#10b981';
+    const COLOR_HIGHLIGHT = '#fbbf24';
+    const COLOR_BOUNDARY = '#f43f5e';
+    const COLOR_AXES = '#334155';
+    const COLOR_SLATE = '#64748b';
+
+    // --- Helper Functions for 3D Projection ---
+    function project(x, y, z) {
+        // Apply rotation
+        let sinX = Math.sin(rotation.x);
+        let cosX = Math.cos(rotation.x);
+        let sinY = Math.sin(rotation.y);
+        let cosY = Math.cos(rotation.y);
+
+        // Rotate around Y-axis
+        let x1 = x * cosY - z * sinY;
+        let z1 = x * sinY + z * cosY;
+
+        // Rotate around X-axis
+        let y1 = y * cosX - z1 * sinX;
+        let z2 = y * sinX + z1 * cosX;
+
+        // Translate relative to camera
+        let px = x1 - camera.x;
+        let py = y1 - camera.y;
+        let pz = z2 - camera.z;
+
+        // Apply perspective division
+        // Cap pz to prevent division by zero or negative focal length issues
+        const cappedPz = Math.max(pz, -camera.focalLength + 1); 
+        const scale = camera.focalLength / (camera.focalLength + cappedPz);
+        
+        const screenX = WIDTH / 2 + px * scale;
+        const screenY = HEIGHT / 2 + py * scale;
+
+        return { x: screenX, y: screenY, scale: scale, z: pz };
+    }
+
+    function drawLine3D(x1, y1, z1, x2, y2, z2, color, lineWidth, dashed = false) {
+        const p1 = project(x1, y1, z1);
+        const p2 = project(x2, y2, z2);
+
+        if (p1.z > -camera.focalLength && p2.z > -camera.focalLength) { // Only draw if not behind camera
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth * Math.min(p1.scale, p2.scale); // Scale line width too
+            if (dashed) ctx.setLineDash([5 * Math.min(p1.scale, p2.scale), 5 * Math.min(p1.scale, p2.scale)]);
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset line dash
+        }
+    }
+
+    function drawRect3D(x, y, z, width, height, color, fill = true, stroke = true, lineWidth = 2) {
+        const hw = width / 2;
+        const hh = height / 2;
+
+        const p1 = project(x - hw, y - hh, z);
+        const p2 = project(x + hw, y - hh, z);
+        const p3 = project(x + hw, y + hh, z);
+        const p4 = project(x - hw, y + hh, z);
+
+        if (p1.z > -camera.focalLength && p2.z > -camera.focalLength && p3.z > -camera.focalLength && p4.z > -camera.focalLength) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.lineTo(p4.x, p4.y);
+            ctx.closePath();
+
+            if (fill) {
+                ctx.fillStyle = color;
+                ctx.fill();
+            }
+            if (stroke) {
+                ctx.strokeStyle = COLOR_HIGHLIGHT;
+                ctx.lineWidth = lineWidth * p1.scale;
+                ctx.stroke();
+            }
+        }
+    }
+
+    function drawCircle3D(x, y, z, radius, color, fill = true, stroke = true, lineWidth = 2, opacity = 1) {
+        const p = project(x, y, z);
+        if (p.z > -camera.focalLength) {
+            const scaledRadius = radius * p.scale;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, scaledRadius, 0, Math.PI * 2);
+            ctx.closePath();
+
+            if (fill) {
+                ctx.fillStyle = `rgba(${parseInt(color.slice(1,3), 16)}, ${parseInt(color.slice(3,5), 16)}, ${parseInt(color.slice(5,7), 16)}, ${opacity})`;
+                ctx.fill();
+            }
+            if (stroke) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = lineWidth * p.scale;
+                ctx.stroke();
+            }
+        }
+    }
+
+    // --- Scene Setup ---
+    function initScene() {
+        // Omega Plane (a large grid)
+        const gridSize = 300;
+        const gridSpacing = 50;
+        const gridColor = COLOR_AXES;
+
+        // Add grid lines for Omega
+        for (let i = -gridSize; i <= gridSize; i += gridSpacing) {
+            worldObjects.push({
+                type: 'line',
+                x1: i, y1: -gridSize, z1: 0, x2: i, y2: gridSize, z2: 0, color: gridColor, lineWidth: 1, depthZ: 0
+            });
+            worldObjects.push({
+                type: 'line',
+                x1: -gridSize, y1: i, z1: 0, x2: gridSize, y2: i, z2: 0, color: gridColor, lineWidth: 1, depthZ: 0
+            });
+        }
+
+        // Omega Boundary (a rectangle)
+        worldObjects.push({
+            type: 'rect_stroke',
+            x: 0, y: 0, z: 0, width: gridSize * 2, height: gridSize * 2, color: COLOR_PRIMARY, lineWidth: 2, depthZ: 0
+        });
+
+        // Events (Circles)
+        // E1
+        worldObjects.push({
+            id: 'E1',
+            type: 'circle',
+            x: -70, y: 50, z: 1, radius: 90, color: COLOR_SECONDARY, opacity: 0.6, depthZ: 1, visible: false
+        });
+        // E2
+        worldObjects.push({
+            id: 'E2',
+            type: 'circle',
+            x: 80, y: 60, z: 1, radius: 100, color: COLOR_HIGHLIGHT, opacity: 0.6, depthZ: 1, visible: false
+        });
+
+        // E1 Complement (represented as a 'hole' or inverse region on Omega)
+        // For visualization, we'll draw Omega and then 'punch out' E1 with a transparent or background color fill.
+        // Or, better, draw E1 and then a bounding box for E1^c, but this is complex in simple canvas.
+        // A simpler way for E1^c: draw a large rectangle representing Omega, then draw E1 on top of it.
+        // To show E1^c, we'll just highlight the Omega boundary and make E1 transparent or a different color.
+        
+        // Union (E1 U E2) - a special object for rendering the combined shape
+        worldObjects.push({
+            id: 'E1_UNION_E2',
+            type: 'union_shape',
+            elements: ['E1', 'E2'], // References to other objects
+            color: COLOR_PRIMARY, opacity: 0.7, depthZ: 2, visible: false
+        });
+    }
+
+    // --- Rendering Logic ---
+    function render() {
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+        ctx.fillStyle = BG_COLOR;
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+        // Determine objects to render and their actual Z for sorting
+        let drawableObjects = [];
+        worldObjects.forEach(obj => {
+            if (obj.visible === false) return; // Skip invisible objects
+
+            const p = project(obj.x || 0, obj.y || 0, obj.z || 0);
+            drawableObjects.push({ obj: obj, projectedZ: p.z });
+        });
+
+        // Sort by projected Z (Painter's Algorithm: draw furthest first)
+        drawableObjects.sort((a, b) => b.projectedZ - a.projectedZ);
+
+        drawableObjects.forEach(({ obj }) => {
+            switch (obj.type) {
+                case 'line':
+                    drawLine3D(obj.x1, obj.y1, obj.z1, obj.x2, obj.y2, obj.z2, obj.color, obj.lineWidth, obj.dashed);
+                    break;
+                case 'rect_stroke':
+                    drawRect3D(obj.x, obj.y, obj.z, obj.width, obj.height, obj.color, false, true, obj.lineWidth);
+                    break;
+                case 'circle':
+                    drawCircle3D(obj.x, obj.y, obj.z, obj.radius, obj.color, true, true, 2, obj.opacity);
+                    break;
+                case 'union_shape':
+                    if (obj.elements && obj.elements.length > 0) {
+                        // This is a simplified union visualization using canvas composite operations
+                        // A more robust solution would involve path merging, but this is illustrative.
+                        // For now, let's just highlight the bounding box of the union or draw an abstract union.
+                        // Or, draw the constituent parts with a special union color.
+                        const elementsToUnion = worldObjects.filter(o => obj.elements.includes(o.id));
+                        if (elementsToUnion.length > 0) {
+                             // To visualize union, draw all elements with the union's color
+                             elementsToUnion.forEach(el => {
+                                 drawCircle3D(el.x, el.y, el.z, el.radius, obj.color, true, true, 2, obj.opacity);
+                             });
+                        }
+                    }
+                    break;
+            }
+        });
+
+        drawHUD();
+        requestAnimationFrame(render);
+    }
+
+    // --- HUD and Text ---
+    const stepDescriptions = [
+        "Introducing \\Omega: The Sample Space",
+        "Introducing Events (Ei) & Algebra \\mathcal{F}",
+        "\\mathcal{F} Properties: \\Omega, Complements, Unions",
+        "Discrete vs. Continuous Spaces"
+    ];
+
+    function drawHUD() {
+        ctx.textAlign = 'left';
+
+        // Line 1: Title
+        ctx.fillStyle = COLOR_PRIMARY;
+        ctx.font = '16px monospace';
+        ctx.fillText('Sample Spaces \u0026 Event Algebras', 20, 30);
+
+        // Line 2: Step Tracker
+        ctx.fillStyle = COLOR_HIGHLIGHT;
+        ctx.font = '14px monospace';
+        ctx.fillText(`Step ${currentStep}/${maxSteps}: ${stepDescriptions[currentStep - 1]}`, 20, 55);
+
+        // Line 3: Live Telemetry
+        ctx.fillStyle = COLOR_SECONDARY;
+        ctx.font = '14px monospace';
+        ctx.fillText(`Rotation: X: ${rotation.x.toFixed(2)} Y: ${rotation.y.toFixed(2)}`, 20, 80);
+
+        // Footer
+        ctx.fillStyle = COLOR_SLATE;
+        ctx.font = '12px monospace';
+        ctx.fillText('Click Left: Prev Step | Click Right: Next Step | Interaction: Drag/Orbit', 20, 580);
+    }
+
+    // --- Interaction Handlers ---
+    function advanceToStep(step) {
+        currentStep = Math.max(1, Math.min(maxSteps, step));
+
+        // Reset visibility for all dynamic elements
+        worldObjects.forEach(obj => {
+            if (obj.id === 'E1' || obj.id === 'E2' || obj.id === 'E1_UNION_E2') {
+                obj.visible = false;
+            }
+        });
+
+        // Update scene based on step
+        switch (currentStep) {
+            case 1:
+                // Only Omega (grid and boundary) is visible by default
+                break;
+            case 2:
+                // Show E1 and E2
+                worldObjects.find(o => o.id === 'E1').visible = true;
+                worldObjects.find(o => o.id === 'E2').visible = true;
+                break;
+            case 3:
+                // Show E1, E2, and then highlight properties (handled by specific drawing or visual cues)
+                // For complement, we'll indicate E1 is the event, the rest is complement.
+                // For union, we will draw the union shape.
+                worldObjects.find(o => o.id === 'E1').visible = true; // Make E1 primary
+                worldObjects.find(o => o.id === 'E2').visible = true;
+                worldObjects.find(o => o.id === 'E1_UNION_E2').visible = true;
+                // For visual clarity on step 3 for complement and union, we might adjust colors/opacity
+                const E1 = worldObjects.find(o => o.id === 'E1');
+                if(E1) E1.color = COLOR_SECONDARY; E1.opacity = 0.6; // Normal for complement discussion
+
+                break;
+            case 4:
+                // All events visible, focus on text description
+                worldObjects.find(o => o.id === 'E1').visible = true;
+                worldObjects.find(o => o.id === 'E2').visible = true;
+                worldObjects.find(o => o.id === 'E1_UNION_E2').visible = false; // Turn off union for this step
+                const E_1 = worldObjects.find(o => o.id === 'E1');
+                const E_2 = worldObjects.find(o => o.id === 'E2');
+                if(E_1) E_1.opacity = 0.4; E_1.color = COLOR_SECONDARY; // More subtle
+                if(E_2) E_2.opacity = 0.4; E_2.color = COLOR_HIGHLIGHT; // More subtle
+                break;
+        }
+    }
+
+    canvas.addEventListener('pointerdown', e => {
+        isDragging = true;
+        lastPointerX = e.clientX;
+        lastPointerY = e.clientY;
+        startX = e.clientX; // For click detection
+        startY = e.clientY; // For click detection
+        startTime = Date.now();
+        canvas.style.cursor = 'grabbing';
+    });
+
+    canvas.addEventListener('pointermove', e => {
+        if (!isDragging) return;
+        const dx = e.clientX - lastPointerX;
+        const dy = e.clientY - lastPointerY;
+
+        rotation.y += dx * 0.005; // Rotate around Y-axis (yaw)
+        rotation.x -= dy * 0.005; // Rotate around X-axis (pitch)
+
+        // Clamp rotation.x to prevent flipping
+        rotation.x = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, rotation.x));
+
+        lastPointerX = e.clientX;
+        lastPointerY = e.clientY;
+    });
+
+    canvas.addEventListener('pointerup', e => {
+        isDragging = false;
+        canvas.style.cursor = 'grab';
+
+        const elapsed = Date.now() - startTime;
+        const distance = Math.sqrt(Math.pow(e.clientX - startX, 2) + Math.pow(e.clientY - startY, 2));
+
+        // If it was a quick tap, not a drag
+        if (distance < 15 && elapsed < 350) {
+            if (e.clientX < WIDTH / 3) {
+                advanceToStep(currentStep - 1);
+            } else {
+                advanceToStep(currentStep + 1);
+            }
+        }
+    });
+
+    // Initialize and start
+    initScene();
+    advanceToStep(1); // Set initial step
+    requestAnimationFrame(render);
+</script>

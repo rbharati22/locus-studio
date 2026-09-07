@@ -1,0 +1,781 @@
+{
+  "project_title": "Foundational Probability Theory for Computer Science",
+  "subject": "Discrete Mathematics & Computational Stochastics",
+  "author": "Prof. Locus AI Studio",
+  "theme": "locus_cinematic",
+  "slides": [
+    {
+      "id": "slide_01_hook",
+      "title": "Uncertainty in Distributed Systems",
+      "subtitle": "When Determinism Fails at Scale",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Modern distributed architectures (DHTs, consensus engines, cloud meshes) cannot assume deterministic packet delivery or collision-free hashing.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "Engineering Failure: In a network of $N = 10^6$ nodes with independent link failure probability $p = 10^{-4}$, the probability of at least one partition exceeds $99.999%$.",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(\\text{Failure}) = 1 - (1 - p)^N \\approx 1 - e^{-Np} \\to 1.0",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Rigorous probability space $(\\Omega, \\mathcal{F}, P)$ formalizes stochastic guarantees in algorithm design.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "distributed_hash_failure.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Introduce the distributed hash collision and link failure problem to ground abstract probability in concrete CSE infrastructure."
+    },
+    {
+      "id": "slide_02_sample_space",
+      "title": "Sample Spaces & Event Algebras",
+      "subtitle": "The Geometry of Outcomes",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "The **sample space** $\\Omega$ is the set of all mutually exclusive primitive computational outcomes.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "An **event algebra** $\\mathcal{F} \\subseteq \\mathcal{P}(\\Omega)$ is a $\\sigma$-algebra closed under complementation and countable unions:",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "1.\\; \\Omega \\in \\mathcal{F}, \\quad 2.\\; E \\in \\mathcal{F} \\implies E^c \\in \\mathcal{F}, \\quad 3.\\; \\{E_i\\}_{i=1}^\\infty \\subseteq \\mathcal{F} \\implies \\bigcup_{i=1}^\\infty E_i \\in \\mathcal{F}",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "In discrete CSE settings, $\\mathcal{F} = \\mathcal{P}(\\Omega)$. In continuous runtime spaces, $\\mathcal{F}$ is the Borel $\\sigma$-algebra $\\mathcal{B}(\\mathbb{R})$.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "sigma_algebra_venn.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Establish set-theoretic rigor. Explain why arbitrary subsets cannot always be measured in continuous spaces, motivating sigma-algebras."
+    },
+    {
+      "id": "slide_03_kolmogorov_axioms",
+      "title": "The Kolmogorov Axioms",
+      "subtitle": "Measure-Theoretic Foundations",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "A **probability measure** is a function $P: \\mathcal{F} \\to [0, 1]$ satisfying Kolmogorov's three core axioms:",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Axiom 1 (Non-negativity): } P(E) \\ge 0, \\quad \\forall E \\in \\mathcal{F}",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Axiom 2 (Unitarity): } P(\\Omega) = 1",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Axiom 3 (}\\sigma\\text{-Additivity): } E_i \\cap E_j = \\emptyset \\implies P\\left(\\bigcup_{i=1}^\\infty E_i\\right) = \\sum_{i=1}^\\infty P(E_i)",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "measure_simplex.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Demonstrate the probability simplex geometry. Stress that probability is normalized volume or measure over the space."
+    },
+    {
+      "id": "slide_04_inclusion_exclusion",
+      "title": "Inclusion-Exclusion Principle",
+      "subtitle": "Analytical Derivation from Additivity",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "For non-disjoint events $A, B \\in \\mathcal{F}$, direct addition double-counts the intersection measure:",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "A \\cup B = A \\cup (B \\setminus (A \\cap B)) \\quad \\text{where disjoint}",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(A \\cup B) = P(A) + P(B \\setminus (A \\cap B))",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(A \\cup B) = P(A) + P(B) - P(A \\cap B)",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "inclusion_exclusion_3d.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Derive union probability algebraically. Show how subtracting the overlap corrects the metric volume."
+    },
+    {
+      "id": "slide_05_conditional_probability",
+      "title": "Conditional Probability",
+      "subtitle": "Relativizing the Subspace Universe",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "When prior knowledge dictates event $B$ occurred ($P(B) > 0$), $\\Omega$ collapses to the sub-universe $B$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(A \\mid B) \\triangleq \\frac{P(A \\cap B)}{P(B)}",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "Multiplication Rule: $P(A \\cap B) = P(B) P(A \\mid B) = P(A) P(B \\mid A)$.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Chain Rule for $n$ sequential compute events: $P(\\bigcap_{i=1}^n A_i) = \\prod_{i=1}^n P(A_i \\mid \\bigcap_{j=1}^{i-1} A_j)$.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "conditional_subspace.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Emphasize conditional probability as renormalization: dividing by P(B) scales the remaining universe back to unit measure 1."
+    },
+    {
+      "id": "slide_06_total_probability",
+      "title": "Law of Total Probability",
+      "subtitle": "Partitioning State Spaces",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Let $\\{B_1, B_2, \\dots, B_k\\}$ form a finite disjoint partition of $\\Omega$, such that $\\bigcup_{i=1}^k B_i = \\Omega$ and $B_i \\cap B_j = \\emptyset$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "A = A \\cap \\Omega = A \\cap \\left( \\bigcup_{i=1}^k B_i \\right) = \\bigcup_{i=1}^k (A \\cap B_i)",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(A) = \\sum_{i=1}^k P(A \\cap B_i) = \\sum_{i=1}^k P(A \\mid B_i) P(B_i)",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Foundation for Markov state decomposition, branch prediction, and recursive algorithmic cost analysis.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "total_prob_partition.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Walk through partitioning geometrically. Show that summing over mutually exclusive slices reconstructs event A."
+    },
+    {
+      "id": "slide_07_bayes_theorem",
+      "title": "Bayes' Theorem & Inference",
+      "subtitle": "Inverting Causal Observations",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Bayesian inversion updates a prior hypothesis probability $P(B_j)$ upon observing algorithmic symptom $A$:",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(B_j \\mid A) = \\frac{P(A \\cap B_j)}{P(A)}",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(B_j \\mid A) = \\frac{P(A \\mid B_j) P(B_j)}{\\sum_{i=1}^k P(A \\mid B_i) P(B_i)}",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "Posterior $\\propto$ Likelihood $\\times$ Prior. Forms the core of spam filtering, intrusion detection, and Kalman filters.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "bayes_updating.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Derive Bayes rule as the quotient of joint probability over total probability. Show visual shift from prior to posterior."
+    },
+    {
+      "id": "slide_08_independence",
+      "title": "Statistical Independence",
+      "subtitle": "Orthogonality vs Disjointness",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Two events $A$ and $B$ are **independent** ($A \\perp B$) if and only if knowledge of $B$ does not perturb $A$:",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(A \\mid B) = P(A) \\iff P(A \\cap B) = P(A) P(B)",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "Crucial CSE Fallacy: Disjoint events ($A \\cap B = \\emptyset$) with non-zero measure are NEVER independent! Since $P(A \\cap B) = 0 \\neq P(A)P(B)$.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Pairwise independence does NOT imply mutual independence: $\\bigcap_{i=1}^n P(A_i) = \\prod P(A_i)$ must hold for all sub-families.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "independence_geometry.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Warn students against confusing disjoint sets with independent sets. Use the interactive canvas to contrast both cases."
+    },
+    {
+      "id": "slide_09_random_variables",
+      "title": "Random Variables & Distributions",
+      "subtitle": "Mapping Sample Spaces to $\\mathbb{R}$",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "A **random variable** $X$ is a measurable function $X: \\Omega \\to \\mathbb{R}$. It maps outcomes to numerical values.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "p_X(x) = P(X = x) = P(\\{\\omega \\in \\Omega : X(\\omega) = x\\})",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "The **Cumulative Distribution Function (CDF)** $F_X(x) = P(X \\le x)$ is monotonically non-decreasing, right-continuous:",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\lim_{x \\to -\\infty} F_X(x) = 0, \\quad \\lim_{x \\to +\\infty} F_X(x) = 1, \\quad P(a < X \\le b) = F_X(b) - F_X(a)",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "pmf_cdf_engine.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Clarify that random variables are deterministic functions from Omega to R, not variables in the standard programming sense."
+    },
+    {
+      "id": "slide_10_expectation_linearity",
+      "title": "Linearity of Expectation",
+      "subtitle": "The Algorithmist's Master Key",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "The **expected value** of a discrete random variable $X$ is the probability-weighted Lebesgue-Stieltjes sum:",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\mathbb{E}[X] = \\sum_{x \\in \\text{Im}(X)} x \\cdot P(X = x)",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "Theorem (Linearity): For ANY random variables $X_1, \\dots, X_n$ (even arbitrarily correlated and dependent):",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\mathbb{E}\\left[ \\sum_{i=1}^n c_i X_i \\right] = \\sum_{i=1}^n c_i \\mathbb{E}[X_i]",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "linearity_expectation.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Highlight that Linearity of Expectation holds regardless of dependence, enabling exact average-case analysis of algorithms like Randomized Quicksort."
+    },
+    {
+      "id": "slide_11_tail_bounds",
+      "title": "Tail Inequalities & Concentration",
+      "subtitle": "Bounding Worst-Case Runtime Latencies",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "In production systems, mean performance $\\mathbb{E}[X]$ is insufficient. We must bound the probability of catastrophic deviations.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Markov: } X \\ge 0, a > 0 \\implies P(X \\ge a) \\le \\frac{\\mathbb{E}[X]}{a}",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Chebyshev: } \\sigma^2 = \\text{Var}(X) \\implies P(|X - \\mu| \\ge k\\sigma) \\le \\frac{1}{k^2}",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "Higher moments yield exponentially tighter tail envelopes: Chernoff bound $P(X \\ge (1+\\delta)\\mu) \\le e^{-\\mu\\delta^2/3}$.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "tail_bounds_visualizer.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Contrast first-moment bounds (Markov) with second-moment bounds (Chebyshev) and demonstrate their decay rates on tail latency."
+    },
+    {
+      "id": "slide_12_bloom_filters",
+      "title": "Application: Bloom Filter Analysis",
+      "subtitle": "Probabilistic Space-Efficient Membership",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "A **Bloom Filter** represents set $S$ with $|S|=n$ using $m$ bits and $k$ independent uniform hash functions $h_i(x) \\in [m]$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(\\text{bit } j \\text{ remains 0 after } n \\text{ insertions}) = \\left(1 - \\frac{1}{m}\\right)^{kn} \\approx e^{-kn/m}",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(\\text{False Positive}) = \\left(1 - \\left(1 - \\frac{1}{m}\\right)^{kn}\\right)^k \\approx (1 - e^{-kn/m})^k",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "Optimal hash count minimizing false positives: $k^* = \\frac{m}{n} \\ln 2 \\implies P(\\text{FP}) \\approx (0.6185)^{m/n}$.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "bloom_filter_sim.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": "Complete the arc by connecting Kolmogorov axioms, independence, and limits to an optimal data structure used in databases and routers."
+    },
+    {
+      "id": "slide_13_summary",
+      "title": "Synthesis & Algorithmic Principles",
+      "subtitle": "The Foundations of Randomized Computing",
+      "layout": "full_theory",
+      "partition": 1.0,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Probability theory provides exact deterministic metrics for unpredictable execution environments.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Axiomatic Grounding:** $(\\Omega, \\mathcal{F}, P)$ guarantees consistency across discrete and continuous program spaces.",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Conditional Inversion:** Bayes' Theorem and Total Probability partition complex state transitions into manageable conditional paths.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Concentration & Tail Risk:** Linearity of Expectation calculates average runtime; Markov, Chebyshev, and Chernoff bound SLA violation risks.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "Next Lecture: Continuous Random Variables, Probability Density Functions (PDFs), and Central Limit Theorem in High-Throughput Streaming.",
+          "highlight": false,
+          "reveal_step": 5,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "none",
+        "src": "",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": false,
+        "controls": false
+      },
+      "speaker_notes": "Summarize the core takeaways. Connect the mathematical framework to production software engineering and announce the next lecture topic."
+    }
+  ],
+  "media_scripts": [
+    {
+      "filename": "distributed_hash_failure.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>\n  body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; }\n  canvas { display: block; width: 100vw; height: 100vh; }\n</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\n\nlet currentStep = 1;\nconst maxSteps = 4;\nconst stepDescriptions = [\n    \"Initial network topology\",\n    \"Simulating link failures with probability p\",\n    \"Probability of at least one link failure\",\n    \"Formalizing uncertainty: Probability Space\"\n];\n\n// --- Canvas & Projection Settings ---\nconst CANVAS_WIDTH = 800;\nconst CANVAS_HEIGHT = 600;\nconst CENTER_X = CANVAS_WIDTH / 2;\nconst CENTER_Y = CANVAS_HEIGHT / 2;\nconst FOCAL_LENGTH = 300; // For perspective projection\n\n// --- 3D Scene Variables ---\nlet nodes = [];\nlet links = [];\nconst NUM_NODES = 60; // Visualized nodes\nconst NODE_RADIUS = 6;\nconst P_VISUAL_FAILURE = 0.08; // Probability of link failure for visualization\nconst SYSTEM_RADIUS = 180; // Radius of the sphere arrangement\n\nlet yaw = 0.0;\nlet pitch = 0.0;\nlet drag = false;\nlet lastX, lastY;\n\n// --- Node structure ---\nclass Node {\n    constructor(id, x, y, z) {\n        this.id = id;\n        this.x = x;\n        this.y = y;\n        this.z = z;\n        this.projected = { x: 0, y: 0, scale: 0, z: 0 };\n    }\n\n    project() {\n        // Apply rotation\n        let rx = this.x, ry = this.y, rz = this.z;\n\n        // Rotate around Y-axis (yaw)\n        let temp_x = rx * Math.cos(yaw) + rz * Math.sin(yaw);\n        let temp_z = -rx * Math.sin(yaw) + rz * Math.cos(yaw);\n        rx = temp_x;\n        rz = temp_z;\n\n        // Rotate around X-axis (pitch)\n        let temp_y = ry * Math.cos(pitch) - rz * Math.sin(pitch);\n        temp_z = ry * Math.sin(pitch) + rz * Math.cos(pitch);\n        ry = temp_y;\n        rz = temp_z;\n\n        // Perspective projection\n        // Cap minimum depth to prevent infinite scaling (nodes too close to focal point)\n        const minZ = -FOCAL_LENGTH + 10; // Ensure z is always > minZ\n        const effectiveZ = Math.max(minZ, rz);\n        const scale = FOCAL_LENGTH / (FOCAL_LENGTH + effectiveZ);\n        this.projected.x = CENTER_X + rx * scale;\n        this.projected.y = CENTER_Y + ry * scale;\n        this.projected.scale = scale;\n        this.projected.z = effectiveZ; // Store for depth sorting\n    }\n\n    draw(ctx, isFailed = false) {\n        ctx.beginPath();\n        ctx.arc(this.projected.x, this.projected.y, NODE_RADIUS * this.projected.scale, 0, Math.PI * 2);\n        ctx.fillStyle = isFailed ? '#f43f5e' : '#00E5FF';\n        ctx.fill();\n        ctx.strokeStyle = '#334155';\n        ctx.lineWidth = 1 * this.projected.scale;\n        ctx.stroke();\n    }\n}\n\n// --- Link structure ---\nclass Link {\n    constructor(node1, node2) {\n        this.node1 = node1;\n        this.node2 = node2;\n        this.failed = false;\n        this.projected_z = 0; // Average Z for depth sorting\n    }\n\n    // Update projected_z after nodes are projected\n    updateProjectedZ() {\n        this.projected_z = (this.node1.projected.z + this.node2.projected.z) / 2;\n    }\n\n    draw(ctx) {\n        ctx.beginPath();\n        ctx.moveTo(this.node1.projected.x, this.node1.projected.y);\n        ctx.lineTo(this.node2.projected.x, this.node2.projected.y);\n        ctx.strokeStyle = this.failed ? '#f43f5e' : '#10b981';\n        ctx.lineWidth = 2 * Math.min(this.node1.projected.scale, this.node2.projected.scale);\n        ctx.stroke();\n    }\n}\n\nfunction initNodesAndLinks() {\n    nodes = [];\n    links = [];\n    \n    // Arrange nodes on a sphere (Fibonacci sphere / golden spiral distribution)\n    for (let i = 0; i < NUM_NODES; i++) {\n        const phi = Math.acos(1 - (2 * i) / (NUM_NODES - 1)); // latitude\n        const theta = Math.PI * (1 + Math.sqrt(5)) * i; // longitude (golden angle)\n\n        const x = SYSTEM_RADIUS * Math.cos(theta) * Math.sin(phi);\n        const y = SYSTEM_RADIUS * Math.sin(theta) * Math.sin(phi);\n        const z = SYSTEM_RADIUS * Math.cos(phi);\n        nodes.push(new Node(i, x, y, z));\n    }\n\n    // Create a mesh-like structure by connecting to a few nearest neighbors\n    // This approximates a distributed system without a full mesh.\n    const connectionsPerNode = 4; \n    const tempLinks = new Set(); // Use a Set to avoid duplicate links\n\n    for (let i = 0; i < NUM_NODES; i++) {\n        const currentNode = nodes[i];\n        const distances = [];\n        for (let j = 0; j < NUM_NODES; j++) {\n            if (i === j) continue;\n            const otherNode = nodes[j];\n            const dist = Math.sqrt(\n                (currentNode.x - otherNode.x)**2 +\n                (currentNode.y - otherNode.y)**2 +\n                (currentNode.z - otherNode.z)**2\n            );\n            distances.push({ node: otherNode, dist: dist });\n        }\n\n        distances.sort((a, b) => a.dist - b.dist);\n\n        for (let k = 0; k < Math.min(connectionsPerNode, distances.length); k++) {\n            const targetNode = distances[k].node;\n            const linkKey = `${Math.min(currentNode.id, targetNode.id)}-${Math.max(currentNode.id, targetNode.id)}`;\n            if (!tempLinks.has(linkKey)) {\n                links.push(new Link(currentNode, targetNode));\n                tempLinks.add(linkKey);\n            }\n        }\n    }\n}\n\ninitNodesAndLinks(); // Initialize once\n\n// --- State Variables for Telemetry ---\nlet failedLinkCount = 0;\nlet probabilityOfAtLeastOneFailure = 0;\n\nfunction updateSimulationState() {\n    failedLinkCount = 0;\n    if (currentStep >= 2) {\n        for (const link of links) {\n            link.failed = Math.random() < P_VISUAL_FAILURE;\n            if (link.failed) {\n                failedLinkCount++;\n            }\n        }\n        // Calculate P(at least one link failure) for the *visualized* system\n        const totalLinks = links.length;\n        if (totalLinks > 0) {\n             probabilityOfAtLeastOneFailure = 1 - Math.pow((1 - P_VISUAL_FAILURE), totalLinks);\n        } else {\n             probabilityOfAtLeastOneFailure = 0;\n        }\n       \n    } else {\n        for (const link of links) {\n            link.failed = false;\n        }\n    }\n}\n\nfunction advanceToStep(step) {\n    currentStep = Math.max(1, Math.min(maxSteps, step));\n    updateSimulationState(); // Re-evaluate link failures on step change\n}\n\n// --- Animation Loop ---\nfunction animate() {\n    // Clear canvas\n    ctx.fillStyle = '#0f172a';\n    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);\n\n    // Update and Project all nodes\n    for (const node of nodes) {\n        node.project();\n    }\n\n    // Update Z for links and prepare all renderable objects for depth sorting\n    let renderableObjects = [];\n    for (const node of nodes) {\n        renderableObjects.push({ type: 'node', obj: node, z: node.projected.z });\n    }\n    for (const link of links) {\n        link.updateProjectedZ();\n        renderableObjects.push({ type: 'link', obj: link, z: link.projected_z });\n    }\n\n    // Depth sort (Painter's Algorithm) - draw farthest first\n    renderableObjects.sort((a, b) => b.z - a.z); // Sort by Z, farthest (largest Z) first\n\n    // Draw objects\n    for (const item of renderableObjects) {\n        if (item.type === 'link') {\n            if (currentStep === 1) {\n                 // On step 1, all links are considered active for visualization\n                 // (even if updateSimulationState set some to failed, we override visually)\n                const originalFailedState = item.obj.failed;\n                item.obj.failed = false;\n                item.obj.draw(ctx);\n                item.obj.failed = originalFailedState; // Restore for next step\n            } else {\n                 item.obj.draw(ctx);\n            }\n        } else if (item.type === 'node') {\n            let isNodeInFailedLink = false;\n            if (currentStep >= 2) {\n                for (const link of links) {\n                    if (link.failed && (link.node1 === item.obj || link.node2 === item.obj)) {\n                        isNodeInFailedLink = true;\n                        break;\n                    }\n                }\n            }\n            item.obj.draw(ctx, isNodeInFailedLink && currentStep >= 2);\n        }\n    }\n\n    // --- HUD ---\n    ctx.fillStyle = '#00E5FF';\n    ctx.font = '16px monospace';\n    ctx.fillText('Uncertainty in Distributed Systems', 20, 30);\n\n    ctx.fillStyle = '#fbbf24';\n    ctx.font = '14px monospace';\n    ctx.fillText(`Step ${currentStep}/${maxSteps}: ${stepDescriptions[currentStep - 1]}`, 20, 55);\n\n    ctx.fillStyle = '#10b981';\n    ctx.font = '14px monospace';\n    let telemetryText = `Nodes: ${NUM_NODES}, Links: ${links.length}`;\n    if (currentStep >= 2) {\n        telemetryText += `, p_visual: ${P_VISUAL_FAILURE.toFixed(3)}`;\n        telemetryText += `, Failed Links: ${failedLinkCount}`;\n    }\n    if (currentStep >= 3) {\n        telemetryText += `, P(at least 1 fail): ${(probabilityOfAtLeastOneFailure * 100).toFixed(3)}%`;\n    }\n    ctx.fillText(telemetryText, 20, 80);\n\n    ctx.fillStyle = '#64748b';\n    ctx.font = '12px monospace';\n    ctx.fillText('Click Left: Prev Step | Click Right: Next Step | Drag: Orbit View', 20, 580);\n\n    requestAnimationFrame(animate);\n}\n\n// --- Event Listeners ---\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => {\n    startX = e.clientX;\n    startY = e.clientY;\n    startTime = Date.now();\n    drag = true;\n    lastX = e.clientX;\n    lastY = e.clientY;\n});\n\nwindow.addEventListener('pointermove', e => {\n    if (drag) {\n        const dx = e.clientX - lastX;\n        const dy = e.clientY - lastY;\n        yaw += dx * 0.005;\n        pitch -= dy * 0.005; // Invert for more intuitive vertical drag\n        \n        // Clamp pitch to prevent flipping\n        pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));\n        \n        lastX = e.clientX;\n        lastY = e.clientY;\n    }\n});\n\nwindow.addEventListener('pointerup', e => {\n    drag = false;\n    if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n        if (e.clientX < window.innerWidth / 3) {\n            advanceToStep(currentStep - 1);\n        } else {\n            advanceToStep(currentStep + 1);\n        }\n    }\n});\n\n// Initial call to start the animation\ninitNodesAndLinks();\nadvanceToStep(1); // Set initial step and state\nanimate();\n\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "sigma_algebra_venn.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  // Draw Universal Set Omega\n  ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;\n  ctx.strokeRect(150, 140, 500, 360);\n  ctx.fillStyle = 'rgba(100, 116, 139, 0.1)'; ctx.fillRect(150, 140, 500, 360);\n  ctx.font = '16px monospace'; ctx.fillStyle = '#64748b'; ctx.fillText('Universal Sample Space \u03a9', 165, 165);\n\n  // Base circle positions\n  const c1x = 340, c1y = 320, r1 = 110;\n  const c2x = 460, c2y = 320, r2 = 110;\n\n  if (currentStep === 1) {\n    ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(c1x, c1y, r1, 0, Math.PI*2); ctx.stroke();\n    ctx.strokeStyle = '#10b981'; ctx.beginPath(); ctx.arc(c2x, c2y, r2, 0, Math.PI*2); ctx.stroke();\n    ctx.fillStyle = '#00E5FF'; ctx.fillText('Event A', 270, 320);\n    ctx.fillStyle = '#10b981'; ctx.fillText('Event B', 490, 320);\n  } else if (currentStep === 2) {\n    // Complement A^c\n    ctx.fillStyle = 'rgba(244, 63, 94, 0.2)'; ctx.fillRect(150, 140, 500, 360);\n    ctx.save();\n    ctx.globalCompositeOperation = 'destination-out';\n    ctx.beginPath(); ctx.arc(c1x, c1y, r1, 0, Math.PI*2); ctx.fill();\n    ctx.restore();\n    ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(c1x, c1y, r1, 0, Math.PI*2); ctx.stroke();\n    ctx.fillStyle = '#f43f5e'; ctx.fillText('Complement A^c = \u03a9 \\\\ A', 165, 480);\n  } else if (currentStep === 3) {\n    // Intersection A cap B\n    ctx.save();\n    ctx.beginPath(); ctx.arc(c1x, c1y, r1, 0, Math.PI*2); ctx.clip();\n    ctx.beginPath(); ctx.arc(c2x, c2y, r2, 0, Math.PI*2);\n    ctx.fillStyle = 'rgba(251, 191, 36, 0.6)'; ctx.fill();\n    ctx.restore();\n    ctx.strokeStyle = '#00E5FF'; ctx.beginPath(); ctx.arc(c1x, c1y, r1, 0, Math.PI*2); ctx.stroke();\n    ctx.strokeStyle = '#10b981'; ctx.beginPath(); ctx.arc(c2x, c2y, r2, 0, Math.PI*2); ctx.stroke();\n    ctx.fillStyle = '#fbbf24'; ctx.fillText('Intersection A \u2229 B', 340, 325);\n  } else if (currentStep === 4) {\n    // Union A cup B\n    ctx.fillStyle = 'rgba(0, 229, 255, 0.3)';\n    ctx.beginPath(); ctx.arc(c1x, c1y, r1, 0, Math.PI*2); ctx.fill();\n    ctx.fillStyle = 'rgba(16, 185, 129, 0.3)';\n    ctx.beginPath(); ctx.arc(c2x, c2y, r2, 0, Math.PI*2); ctx.fill();\n    ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2.5;\n    ctx.beginPath(); ctx.arc(c1x, c1y, r1, 0, Math.PI*2); ctx.stroke();\n    ctx.beginPath(); ctx.arc(c2x, c2y, r2, 0, Math.PI*2); ctx.stroke();\n    ctx.fillStyle = '#ffffff'; ctx.fillText('Union A \u222a B \u2208 F', 360, 325);\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Sigma-Algebra & Set Measure Topology', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Primitive Event Subsets in \u03a9', 'Closure Under Complement A^c', 'Closure Under Intersection A \u2229 B', 'Closure Under Countable Union A \u222a B'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  const meas = ['\u03bc(A) = 0.35, \u03bc(B) = 0.35', '\u03bc(A^c) = 0.65', '\u03bc(A \u2229 B) = 0.12', '\u03bc(A \u222a B) = 0.58'][currentStep-1];\n  ctx.fillText('Telemetry: Measure State -> ' + meas, 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "measure_simplex.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nlet rotX = 0.4, rotY = -0.6;\nlet isDragging = false;\n\nwindow.addEventListener('pointerdown', e => {\n  isDragging = true;\n  startX = e.clientX; startY = e.clientY; startTime = Date.now();\n});\nwindow.addEventListener('pointermove', e => {\n  if (isDragging) {\n    rotY += (e.clientX - startX) * 0.008;\n    rotX += (e.clientY - startY) * 0.008;\n    startX = e.clientX; startY = e.clientY;\n  }\n});\nwindow.addEventListener('pointerup', e => {\n  isDragging = false;\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nfunction project(x, y, z) {\n  let cy = Math.cos(rotY), sy = Math.sin(rotY);\n  let cx = Math.cos(rotX), sx = Math.sin(rotX);\n  let x1 = x * cy + z * sy;\n  let z1 = -x * sy + z * cy;\n  let y1 = y * cx - z1 * sx;\n  let z2 = y * sx + z1 * cx;\n  let scale = 320 / (320 + z2 + 200);\n  return { x: 400 + x1 * scale * 1.5, y: 340 - y1 * scale * 1.5, depth: z2 };\n}\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n  if (!isDragging) rotY += 0.003;\n\n  // 3D Probability Simplex Vertices (p1+p2+p3 = 1)\n  const s = 140;\n  const v1 = { x: s, y: 0, z: 0 };\n  const v2 = { x: 0, y: s, z: 0 };\n  const v3 = { x: 0, y: 0, z: s };\n  const origin = { x: 0, y: 0, z: 0 };\n\n  const pO = project(origin.x, origin.y, origin.z);\n  const p1 = project(v1.x, v1.y, v1.z);\n  const p2 = project(v2.x, v2.y, v2.z);\n  const p3 = project(v3.x, v3.y, v3.z);\n\n  // Axes\n  ctx.lineWidth = 1; ctx.strokeStyle = '#334155';\n  ctx.beginPath(); ctx.moveTo(pO.x, pO.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();\n  ctx.beginPath(); ctx.moveTo(pO.x, pO.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();\n  ctx.beginPath(); ctx.moveTo(pO.x, pO.y); ctx.lineTo(p3.x, p3.y); ctx.stroke();\n\n  // Simplex Face\n  ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y); ctx.closePath();\n  ctx.fillStyle = (currentStep === 2 || currentStep === 4) ? 'rgba(0, 229, 255, 0.4)' : 'rgba(0, 229, 255, 0.15)';\n  ctx.fill();\n  ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 2.5; ctx.stroke();\n\n  // Active Step Highlight Points\n  if (currentStep >= 2) {\n    const pSum = project(s/3, s/3, s/3);\n    ctx.beginPath(); ctx.arc(pSum.x, pSum.y, 6, 0, Math.PI*2);\n    ctx.fillStyle = '#fbbf24'; ctx.fill();\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Kolmogorov Probability Simplex \u0394^2 in R^3', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Axiom 1: Non-negativity p_i >= 0', 'Axiom 2: Unitarity sum(p_i) = 1', 'Axiom 3: Countable Additivity', 'Unit Measure Field Complete'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  ctx.fillText('Telemetry: L1-Norm ||p||_1 = 1.0000 | P(\u03a9) = 1.0000', 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "inclusion_exclusion_3d.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  const ax = 330, ay = 320, ar = 120;\n  const bx = 470, by = 320, br = 120;\n\n  // Step 1: Base A\n  ctx.fillStyle = (currentStep >= 1) ? 'rgba(0, 229, 255, 0.25)' : 'transparent';\n  ctx.beginPath(); ctx.arc(ax, ay, ar, 0, Math.PI*2); ctx.fill();\n  ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 2.5; ctx.stroke();\n\n  // Step 2: Base B\n  if (currentStep >= 2) {\n    ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';\n    ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI*2); ctx.fill();\n    ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2.5; ctx.stroke();\n  }\n\n  // Step 3 & 4: Highlight Overlap\n  if (currentStep === 3) {\n    ctx.save();\n    ctx.beginPath(); ctx.arc(ax, ay, ar, 0, Math.PI*2); ctx.clip();\n    ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI*2);\n    ctx.fillStyle = 'rgba(244, 63, 94, 0.7)'; ctx.fill();\n    ctx.restore();\n    ctx.fillStyle = '#f43f5e'; ctx.font = '14px monospace';\n    ctx.fillText('Double Counted: +P(A \u2229 B)', 310, 320);\n  } else if (currentStep === 4) {\n    ctx.save();\n    ctx.beginPath(); ctx.arc(ax, ay, ar, 0, Math.PI*2); ctx.clip();\n    ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI*2);\n    ctx.fillStyle = 'rgba(251, 191, 36, 0.7)'; ctx.fill();\n    ctx.restore();\n    ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace';\n    ctx.fillText('Subtracted Once: -P(A \u2229 B)', 305, 320);\n  }\n\n  // Labels\n  ctx.font = '15px monospace';\n  ctx.fillStyle = '#00E5FF'; ctx.fillText('P(A) = 0.50', 240, 220);\n  if (currentStep >= 2) {\n    ctx.fillStyle = '#10b981'; ctx.fillText('P(B) = 0.50', 480, 220);\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Analytical Proof: Inclusion-Exclusion Measure Compensation', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Step 1: Compute P(A) Mass', 'Step 2: Add P(B) -> Overlap Emerges', 'Step 3: Identify Error Mass 2x P(A \u2229 B)', 'Step 4: Subtract P(A \u2229 B) -> Exact Measure'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  const res = ['P(A) = 0.50', 'Sum = 1.00 (Uncorrected)', 'Overlap = 0.22 (Double Counted)', 'P(A \u222a B) = 0.78 (Exact)'][currentStep-1];\n  ctx.fillText('Telemetry: ' + res, 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "conditional_subspace.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  const isBActive = currentStep >= 2;\n  const isScaled = currentStep === 4;\n\n  // Outer space Omega\n  ctx.strokeStyle = isBActive ? '#334155' : '#64748b';\n  ctx.lineWidth = 2; ctx.strokeRect(120, 140, 560, 360);\n  ctx.font = '14px monospace'; ctx.fillStyle = isBActive ? '#334155' : '#64748b';\n  ctx.fillText('Sample Space \u03a9', 135, 165);\n\n  // Event B box\n  const bx = 280, by = 200, bw = 360, bh = 260;\n  ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2.5;\n  ctx.fillStyle = isBActive ? 'rgba(251, 191, 36, 0.15)' : 'transparent';\n  ctx.fillRect(bx, by, bw, bh); ctx.strokeRect(bx, by, bw, bh);\n  ctx.fillStyle = '#fbbf24'; ctx.fillText('Conditioning Subspace B', bx + 15, by + 25);\n\n  // Event A Circle\n  const ax = 320, ay = 330, ar = 110;\n  ctx.save();\n  ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 2;\n  ctx.beginPath(); ctx.arc(ax, ay, ar, 0, Math.PI*2); ctx.stroke();\n  ctx.restore();\n\n  // Highlight Intersection A cap B\n  ctx.save();\n  ctx.beginPath(); ctx.rect(bx, by, bw, bh); ctx.clip();\n  ctx.beginPath(); ctx.arc(ax, ay, ar, 0, Math.PI*2);\n  ctx.fillStyle = (currentStep >= 3) ? '#10b981' : 'rgba(0, 229, 255, 0.3)';\n  ctx.fill(); ctx.restore();\n\n  if (currentStep >= 3) {\n    ctx.fillStyle = '#10b981'; ctx.font = '14px monospace';\n    ctx.fillText('A \u2229 B', ax - 10, ay + 10);\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Subspace Conditioning & Measure Relativization', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Global Space \u03a9 with Prior Events A & B', 'Conditioning: Event B is Known to Occur', 'Isolating Intersection A \u2229 B Inside B', 'Renormalization: P(A|B) = P(A \u2229 B) / P(B)'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  const stat = ['P(A) = 0.30, P(B) = 0.45', 'P(\u03a9 \\\\ B) Ignored -> 0', 'P(A \u2229 B) = 0.18', 'P(A|B) = 0.18 / 0.45 = 0.4000'][currentStep-1];\n  ctx.fillText('Telemetry: ' + stat, 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "total_prob_partition.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  const px = 120, py = 140, pw = 560, ph = 340;\n  const colW = pw / 4;\n\n  // Partition Slices B1, B2, B3, B4\n  const colors = ['#00E5FF', '#10b981', '#fbbf24', '#f43f5e'];\n  for(let i=0; i<4; i++) {\n    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;\n    ctx.strokeRect(px + i*colW, py, colW, ph);\n    ctx.font = '14px monospace'; ctx.fillStyle = colors[i];\n    ctx.fillText('B' + (i+1), px + i*colW + 15, py + 30);\n  }\n\n  // Event A Overlay Ellipse\n  const ax = 400, ay = 310, rx = 230, ry = 90;\n  if (currentStep >= 2) {\n    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;\n    ctx.beginPath(); ctx.ellipse(ax, ay, rx, ry, 0, 0, Math.PI*2); ctx.stroke();\n    ctx.fillStyle = '#ffffff'; ctx.fillText('Event A', ax - 25, ay - ry - 10);\n  }\n\n  // Slicing A across partitions\n  if (currentStep >= 3) {\n    for(let i=0; i<4; i++) {\n      ctx.save();\n      ctx.beginPath(); ctx.rect(px + i*colW, py, colW, ph); ctx.clip();\n      ctx.beginPath(); ctx.ellipse(ax, ay, rx, ry, 0, 0, Math.PI*2);\n      ctx.fillStyle = colors[i]; ctx.globalAlpha = 0.4; ctx.fill();\n      ctx.restore();\n    }\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Law of Total Probability: Partition Reconstruction', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Step 1: Partition Sample Space into Disjoint Bi', 'Step 2: Overlay Global Target Event A', 'Step 3: Slice A into Disjoint Intersections A \u2229 Bi', 'Step 4: Total Probability Sum Verified'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  const tMet = ['sum(P(Bi)) = 1.00', 'P(A) across 4 partitions', 'P(A) = sum(P(A|Bi)P(Bi))', 'P(A) = 0.08 + 0.16 + 0.14 + 0.06 = 0.4400'][currentStep-1];\n  ctx.fillText('Telemetry: ' + tMet, 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "bayes_updating.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  // Bar Parameters\n  let priorA = 0.20, priorB = 0.80;\n  let likelihoodA = 0.90, likelihoodB = 0.05;\n  let jointA = priorA * likelihoodA; // 0.18\n  let jointB = priorB * likelihoodB; // 0.04\n  let evidence = jointA + jointB;     // 0.22\n  let postA = jointA / evidence;     // 0.818\n  let postB = jointB / evidence;     // 0.182\n\n  let valA = (currentStep === 1) ? priorA : (currentStep === 2 ? likelihoodA : (currentStep === 3 ? jointA : postA));\n  let valB = (currentStep === 1) ? priorB : (currentStep === 2 ? likelihoodB : (currentStep === 3 ? jointB : postB));\n\n  // Draw Bars\n  const maxH = 260;\n  const b1H = valA * maxH;\n  const b2H = valB * maxH;\n\n  ctx.fillStyle = '#00E5FF'; ctx.fillRect(260, 460 - b1H, 100, b1H);\n  ctx.fillStyle = '#fbbf24'; ctx.fillRect(440, 460 - b2H, 100, b2H);\n\n  ctx.font = '14px monospace';\n  ctx.fillStyle = '#00E5FF'; ctx.fillText('H1: Malicious', 250, 490); ctx.fillText((valA*100).toFixed(1) + '%', 290, 440 - b1H);\n  ctx.fillStyle = '#fbbf24'; ctx.fillText('H2: Benign', 450, 490); ctx.fillText((valB*100).toFixed(1) + '%', 470, 440 - b2H);\n\n  // Baseline Axis\n  ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;\n  ctx.beginPath(); ctx.moveTo(200, 460); ctx.lineTo(600, 460); ctx.stroke();\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Bayesian Updating Engine: Intrusion Anomaly Detection', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Step 1: Prior Probabilities P(H)', 'Step 2: Likelihood of Signature Given H', 'Step 3: Joint Likelihood Product', 'Step 4: Normalized Posterior P(H|E) Calculated'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  const mStr = ['P(Malicious Prior) = 0.20', 'P(Sig|Mal) = 0.90, P(Sig|Ben) = 0.05', 'Total Evidence P(Sig) = 0.22', 'Posterior P(Mal|Sig) = 81.82%'][currentStep-1];\n  ctx.fillText('Telemetry: ' + mStr, 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "independence_geometry.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  // Disjoint Setup vs Independent Setup\n  if (currentStep <= 2) {\n    // Disjoint (Mutually Exclusive)\n    ctx.strokeStyle = '#334155'; ctx.strokeRect(150, 160, 500, 300);\n    ctx.fillStyle = '#64748b'; ctx.font = '14px monospace'; ctx.fillText('Disjoint Configuration: A \u2229 B = \u2205', 170, 190);\n\n    ctx.beginPath(); ctx.arc(280, 310, 80, 0, Math.PI*2);\n    ctx.fillStyle = 'rgba(0, 229, 255, 0.4)'; ctx.fill(); ctx.strokeStyle = '#00E5FF'; ctx.stroke();\n    ctx.fillStyle = '#00E5FF'; ctx.fillText('A', 275, 315);\n\n    ctx.beginPath(); ctx.arc(520, 310, 80, 0, Math.PI*2);\n    ctx.fillStyle = 'rgba(244, 63, 94, 0.4)'; ctx.fill(); ctx.strokeStyle = '#f43f5e'; ctx.stroke();\n    ctx.fillStyle = '#f43f5e'; ctx.fillText('B', 515, 315);\n  } else {\n    // Stochastic Independence (Square Area Model)\n    const sx = 250, sy = 160, sw = 300, sh = 300;\n    ctx.strokeStyle = '#64748b'; ctx.strokeRect(sx, sy, sw, sh);\n\n    // P(A) vertical slice, P(B) horizontal slice\n    const wa = sw * 0.4; const hb = sh * 0.6;\n    ctx.fillStyle = 'rgba(0, 229, 255, 0.2)'; ctx.fillRect(sx, sy, wa, sh);\n    ctx.fillStyle = 'rgba(16, 185, 129, 0.2)'; ctx.fillRect(sx, sy + sh - hb, sw, hb);\n\n    // Product Area\n    ctx.fillStyle = 'rgba(251, 191, 36, 0.6)'; ctx.fillRect(sx, sy + sh - hb, wa, hb);\n    ctx.fillStyle = '#fbbf24'; ctx.fillText('A \u2229 B = P(A)P(B)', sx + 10, sy + sh - 20);\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Independence vs Mutually Disjoint Geometry', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Disjoint Sets: Zero Overlap', 'Disjoint Implies Dependent! P(A|B) = 0', 'Independent Sets: Multiplicative Geometry', 'Factorization Holds: P(A \u2229 B) = P(A)P(B)'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  const res = ['P(A \u2229 B) = 0', 'P(A|B) = 0 != P(A) -> Dependent', 'P(A)=0.40, P(B)=0.60', 'P(A \u2229 B) = 0.2400 (Exact Independence)'][currentStep-1];\n  ctx.fillText('Telemetry: ' + res, 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "pmf_cdf_engine.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nconst pmf = [0.1, 0.25, 0.4, 0.15, 0.1];\nconst cdf = [0.1, 0.35, 0.75, 0.90, 1.0];\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  // Draw Left: PMF (Stems)\n  const oxL = 100, oyL = 460;\n  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;\n  ctx.beginPath(); ctx.moveTo(oxL, oyL); ctx.lineTo(oxL + 240, oyL); ctx.stroke();\n  ctx.font = '14px monospace'; ctx.fillStyle = '#00E5FF'; ctx.fillText('PMF: p_X(x) = P(X=x)', oxL, 160);\n\n  for(let i=0; i<pmf.length; i++) {\n    const x = oxL + 30 + i * 45;\n    const h = pmf[i] * 220;\n    ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3;\n    ctx.beginPath(); ctx.moveTo(x, oyL); ctx.lineTo(x, oyL - h); ctx.stroke();\n    ctx.beginPath(); ctx.arc(x, oyL - h, 5, 0, Math.PI*2);\n    ctx.fillStyle = '#fbbf24'; ctx.fill();\n    ctx.fillStyle = '#64748b'; ctx.fillText(i, x-4, oyL + 20);\n  }\n\n  // Draw Right: CDF (Step Function)\n  const oxR = 460, oyR = 460;\n  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;\n  ctx.beginPath(); ctx.moveTo(oxR, oyR); ctx.lineTo(oxR + 260, oyR); ctx.stroke();\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981'; ctx.fillText('CDF: F_X(x) = P(X <= x)', oxR, 160);\n\n  if (currentStep >= 2) {\n    let prevX = oxR;\n    let prevY = oyR;\n    ctx.strokeStyle = '#10b981'; ctx.lineWidth = 3;\n    for(let i=0; i<cdf.length; i++) {\n      const xNext = oxR + 40 + i * 45;\n      const yLevel = oyR - cdf[i] * 220;\n      ctx.beginPath(); ctx.moveTo(prevX, prevY); ctx.lineTo(xNext, prevY); ctx.stroke();\n      ctx.beginPath(); ctx.arc(xNext, prevY, 4, 0, Math.PI*2);\n      ctx.fillStyle = '#0f172a'; ctx.strokeStyle = '#10b981'; ctx.stroke(); ctx.fill(); // Open circle\n      ctx.beginPath(); ctx.arc(xNext, yLevel, 4, 0, Math.PI*2);\n      ctx.fillStyle = '#10b981'; ctx.fill(); // Closed circle\n      prevX = xNext; prevY = yLevel;\n    }\n    ctx.beginPath(); ctx.moveTo(prevX, prevY); ctx.lineTo(oxR + 260, prevY); ctx.stroke();\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Probability Mass Function (PMF) to Cumulative CDF', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Discrete PMF Stem Realization', 'CDF Accumulation Progression', 'Right-Continuous Jump Discontinuities', 'Monotonic Norm: lim F(x) = 1.000'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  const stat = ['sum(p_X(x)) = 1.00', 'F(2) = p(0)+p(1)+p(2) = 0.75', 'Jump at x=2 equals p_X(2) = 0.40', 'P(1 < X <= 3) = F(3) - F(1) = 0.5500'][currentStep-1];\n  ctx.fillText('Telemetry: ' + stat, 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "linearity_expectation.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  const indicators = [0.65, 0.45, 0.85, 0.30, 0.55];\n  const ox = 150, oy = 440;\n\n  // Draw individual indicator expectations E[X_i] = P(A_i)\n  for(let i=0; i<indicators.length; i++) {\n    const x = ox + i * 80;\n    const h = indicators[i] * 180;\n    ctx.fillStyle = '#00E5FF'; ctx.fillRect(x, oy - h, 40, h);\n    ctx.font = '12px monospace'; ctx.fillStyle = '#ffffff';\n    ctx.fillText('E[X' + (i+1) + ']', x, oy + 20);\n    ctx.fillText(indicators[i].toFixed(2), x, oy - h - 8);\n  }\n\n  // Sum Indicator Total Bar\n  if (currentStep >= 2) {\n    const total = indicators.reduce((a,b)=>a+b, 0); // 2.80\n    const tx = 600;\n    const th = (total / 5) * 180;\n    ctx.fillStyle = '#fbbf24'; ctx.fillRect(tx, oy - th, 55, th);\n    ctx.fillStyle = '#fbbf24'; ctx.fillText('E[sum X_i]', tx - 10, oy + 20);\n    ctx.fillText(total.toFixed(2), tx + 10, oy - th - 8);\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Linearity of Expectation for Correlated Random Indicators', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Indicator Random Variables X_i in {0, 1}', 'Additive Summation E[X1 + ... + Xn]', 'Zero Dependence Penalty: Covariance Ignored', 'Exact Complexity Bound Confirmed: O(n log n)'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  ctx.fillText('Telemetry: Total Expected Complexity E[C] = 2.8000 comparisons', 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "tail_bounds_visualizer.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  const ox = 120, oy = 460;\n  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;\n  ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox + 580, oy); ctx.stroke();\n  ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox, oy - 320); ctx.stroke();\n\n  // Distribution Curve\n  ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3;\n  ctx.beginPath();\n  for(let x=0; x<=540; x+=5) {\n    let val = Math.exp(-0.5 * Math.pow((x - 120)/80, 2)) * 260;\n    if (x === 0) ctx.moveTo(ox + x, oy - val);\n    else ctx.lineTo(ox + x, oy - val);\n  }\n  ctx.stroke();\n\n  // Markov Bound Curve a -> mu / a\n  const mu = 80;\n  if (currentStep >= 2) {\n    ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2.5;\n    ctx.beginPath();\n    for(let a=mu+10; a<=540; a+=10) {\n      let bVal = (mu / a) * 260;\n      if (a === mu+10) ctx.moveTo(ox + a, oy - bVal);\n      else ctx.lineTo(ox + a, oy - bVal);\n    }\n    ctx.stroke();\n    ctx.fillStyle = '#fbbf24'; ctx.fillText('Markov Bound: \u03bc / a', ox + 360, oy - 70);\n  }\n\n  // Chebyshev Bound Curve k -> 1 / k^2\n  if (currentStep >= 3) {\n    ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2.5;\n    ctx.beginPath();\n    for(let d=60; d<=540; d+=10) {\n      let cVal = Math.min(1.0, Math.pow(60 / d, 2)) * 260;\n      if (d === 60) ctx.moveTo(ox + d, oy - cVal);\n      else ctx.lineTo(ox + d, oy - cVal);\n    }\n    ctx.stroke();\n    ctx.fillStyle = '#10b981'; ctx.fillText('Chebyshev Bound: \u03c3^2 / a^2', ox + 220, oy - 220);\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Tail Probability Bounds: Markov vs Chebyshev Concentration', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Exact Density Mass Function & Mean \u03bc', 'Markov First-Moment Upper Bound (1/a)', 'Chebyshev Second-Moment Variance Bound (1/a^2)', 'Exponential Tail Decay Verified'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  const stat = ['\u03bc = 80ms, \u03c3 = 24ms', 'P(X >= 240) <= 0.3333 (Markov)', 'P(|X-\u03bc| >= 160) <= 0.0225 (Chebyshev)', 'Tight Bound: True P(X >= 240) = 0.0004'][currentStep-1];\n  ctx.fillText('Telemetry: ' + stat, 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "bloom_filter_sim.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {\n    if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); }\n    else { currentStep = Math.min(maxSteps, currentStep + 1); }\n    advanceToStep(currentStep);\n  }\n});\nfunction advanceToStep(s) { currentStep = s; }\n\nconst bitCount = 20;\nconst bits = new Array(bitCount).fill(0);\n\nfunction render() {\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  // Reset & Set bits according to step\n  bits.fill(0);\n  if (currentStep >= 2) { [2, 5, 11].forEach(i => bits[i] = 1); }\n  if (currentStep >= 3) { [7, 14, 18].forEach(i => bits[i] = 1); }\n  if (currentStep === 4) { [5, 11, 14].forEach(i => bits[i] = 1); }\n\n  // Draw Bit Array Cells\n  const bw = 26, bh = 45, startXPos = 140, startYPos = 280;\n  for(let i=0; i<bitCount; i++) {\n    const x = startXPos + i * (bw + 2);\n    ctx.fillStyle = bits[i] ? '#00E5FF' : '#1e293b';\n    ctx.fillRect(x, startYPos, bw, bh);\n    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.5;\n    ctx.strokeRect(x, startYPos, bw, bh);\n    ctx.font = '14px monospace'; ctx.fillStyle = bits[i] ? '#0f172a' : '#64748b';\n    ctx.fillText(bits[i], x + 9, startYPos + 28);\n    ctx.font = '10px monospace'; ctx.fillStyle = '#64748b';\n    ctx.fillText(i, x + 5, startYPos + 60);\n  }\n\n  // Query Status Indicator\n  if (currentStep === 4) {\n    ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace';\n    ctx.fillText('Query Element \"user_99\": Bits {5, 11, 14} match -> False Positive Collision!', 140, 400);\n  }\n\n  // HUD Telemetry Header\n  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';\n  ctx.fillText('Bloom Filter Probabilistic Data Structure Telemetry', 20, 30);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';\n  const desc = ['Empty Filter: m = 20 bits', 'Insert Item x1 (k = 3 hashes)', 'Insert Item x2 (k = 3 hashes)', 'False Positive Collision Query (k* = (m/n)ln2)'][currentStep-1];\n  ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + desc, 20, 55);\n  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';\n  const pFp = Math.pow(1 - Math.exp(-3 * (currentStep >= 3 ? 2 : 1) / 20), 3).toFixed(4);\n  ctx.fillText('Telemetry: Load Factor = ' + (currentStep*3/20).toFixed(2) + ' | P(False Positive) = ' + pFp, 20, 80);\n\n  // Navigation Footer\n  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';\n  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n\n  requestAnimationFrame(render);\n}\nrequestAnimationFrame(render);\n</script>\n</body>\n</html>"
+    }
+  ]
+}

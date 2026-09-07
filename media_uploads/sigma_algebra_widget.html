@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>
+</head>
+<body>
+<canvas id="stage" width="800" height="600"></canvas>
+<script>
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+let currentStep = 1; const maxSteps = 4;
+const stepDescs = [
+  "Base Space Omega & Trivial Algebra",
+  "Single Generator Set A & Complement A^c",
+  "Partition Generator Sets A and B",
+  "Full Sigma-Algebra Closure (2^k Subsets)"
+];
+
+function render() {
+  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+  ctx.strokeRect(150, 140, 500, 320);
+  
+  if (currentStep === 1) {
+    ctx.fillStyle = 'rgba(0, 229, 255, 0.1)'; ctx.fillRect(150, 140, 500, 320);
+    ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';
+    ctx.fillText('F_trivial = { EmptySet, Omega }', 280, 300);
+  } else if (currentStep === 2) {
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.25)'; ctx.fillRect(150, 140, 250, 320);
+    ctx.fillStyle = 'rgba(0, 229, 255, 0.1)'; ctx.fillRect(400, 140, 250, 320);
+    ctx.fillStyle = '#fbbf24'; ctx.fillText('A', 260, 300);
+    ctx.fillStyle = '#00E5FF'; ctx.fillText('A^c', 510, 300);
+  } else if (currentStep >= 3) {
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.2)'; ctx.fillRect(150, 140, 250, 160);
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.2)'; ctx.fillRect(400, 140, 250, 160);
+    ctx.fillStyle = 'rgba(244, 63, 94, 0.2)'; ctx.fillRect(150, 300, 250, 160);
+    ctx.fillStyle = 'rgba(0, 229, 255, 0.2)'; ctx.fillRect(400, 300, 250, 160);
+    ctx.fillStyle = '#e2e8f0'; ctx.font = '12px monospace';
+    ctx.fillText('A and B', 230, 220);
+    ctx.fillText('A^c and B', 480, 220);
+    ctx.fillText('A and B^c', 230, 380);
+    ctx.fillText('A^c and B^c', 480, 380);
+  }
+  
+  ctx.font = '16px monospace'; ctx.fillStyle = '#00E5FF';
+  ctx.fillText('Sigma-Algebra Closure Visualization', 20, 30);
+  ctx.font = '14px monospace'; ctx.fillStyle = '#fbbf24';
+  ctx.fillText(`Step ${currentStep}/${maxSteps}: ${stepDescs[currentStep-1]}`, 20, 55);
+  ctx.font = '14px monospace'; ctx.fillStyle = '#10b981';
+  const subCount = Math.pow(2, Math.min(currentStep, 3));
+  ctx.fillText(`Minimal Subsets |F| = ${subCount} | Closed under Union/Complement: True`, 20, 80);
+  
+  ctx.font = '12px monospace'; ctx.fillStyle = '#64748b';
+  ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap to Advance]', 20, 580);
+}
+
+let startX, startY, startTime;
+window.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });
+window.addEventListener('pointerup', e => {
+  if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) {
+    if (e.clientX < window.innerWidth / 3) currentStep = Math.max(1, currentStep - 1);
+    else currentStep = Math.min(maxSteps, currentStep + 1);
+    render();
+  }
+});
+render();
+</script>
+</body>
+</html>

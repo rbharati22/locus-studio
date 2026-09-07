@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locus Engine - Cinematic Presentation</title>
+    
+    <!-- KaTeX for instantaneous Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <link rel="stylesheet" href="/static/presentation.css?v=2">
+</head>
+<body class="scaffolding-idle"> <!-- Starts with scaffolding hidden -->
+
+    <!-- Cinematic Intro Overlay (Slide 0) -->
+    <div id="cinematicIntro" class="cinematic-intro">
+        <div id="introTitle" class="intro-title">Loading...</div>
+        <div id="introSubtitle" class="intro-subtitle"></div>
+    </div>
+
+    <!-- Permanent UI Scaffolding -->
+    <div class="locus-top-bar"></div>
+    <div class="locus-ticker" id="locusTicker">LOCUS ANALYTICS ENGINE // SIMULATION SYSTEM</div>
+    <div class="locus-rings">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+    </div>
+
+    <button class="nav-toggle-btn" onclick="document.getElementById('slideNavDrawer').classList.toggle('open');" title="Table of Contents">☰</button>
+    <div id="slideNavDrawer" class="slide-nav-drawer">
+        <div class="nav-drawer-header">Table of Contents</div>
+        <div id="slideNavList" class="slide-nav-list"></div>
+    </div>
+
+    <div class="workspace-grid">
+        <main class="presentation-stage" id="presentationStage">
+            
+            <!-- Slide Container (Holds HTML/Math/Media) -->
+            <div id="slideContainer" class="slide-container">
+                <!-- Fragments and Panels inject here -->
+            </div>
+
+            <!-- Global Slide Inking Layer (Must sit above slide container but below blackboard/UI) -->
+            <canvas id="slideInkCanvas" class="ink-overlay"></canvas>
+
+            <!-- Presenter Toolkit -->
+            <div class="presenter-controls">
+                <button onclick="prevStep()" title="Previous Step/Slide">◀</button>
+                <button onclick="nextStep()" title="Next Step/Slide">▶</button>
+                <button id="penToggleBtn" onclick="togglePenMode()" title="Toggle Pen Mode">🖊️</button>
+                <button onclick="toggleFloatingBlackboard()" title="Floating Blackboard">⬛</button>
+                <button onclick="clearSlideInk()" title="Clear Slide Ink">🧽</button>
+                <button onclick="document.documentElement.requestFullscreen()" title="Fullscreen">⛶</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Floating Resizable Blackboard -->
+    <div id="floatingBlackboard" class="floating-blackboard">
+        <div id="bbHandle" class="bb-handle">
+            <span>🖐️ Teaching Blackboard</span>
+            <div class="bb-controls">
+                <button onclick="clearBlackboard()" title="Clear">🧽</button>
+                <button onclick="toggleFloatingBlackboard()" title="Close">✖</button>
+            </div>
+        </div>
+        <div id="bbScrollArea" class="bb-scroll-area">
+            <canvas id="boardInkCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Engine Scripts -->
+    <script src="/static/presentation_engine.js?v=2"></script>
+    <script src="/static/inking_blackboard.js"></script>
+    
+    <!-- Initialization Script -->
+    <script>
+        // On load, pull the deck the Author created in the editor
+        window.onload = () => {
+            const savedDeck = localStorage.getItem('locusCurrentDeck');
+            if (savedDeck) {
+                try {
+                    const deckData = JSON.parse(savedDeck);
+                    
+                    // Populate Intro Screen Data
+                    document.getElementById('introTitle').innerText = deckData.project_title || "Untitled Presentation";
+                    document.getElementById('introSubtitle').innerText = (deckData.subject ? deckData.subject + " - " : "") + (deckData.author || "Prof. Rakesh Bharati");
+                    
+                    // Animate the text in after a brief delay
+                    setTimeout(() => {
+                        document.getElementById('cinematicIntro').classList.add('show-text');
+                    }, 500);
+
+                    // Initialize the Engine
+                    loadDeck(deckData); 
+                } catch (e) {
+                    console.error("Error loading deck data.", e);
+                }
+            } else {
+                document.getElementById('introTitle').innerText = "No presentation loaded.";
+                document.getElementById('introSubtitle').innerText = "Please launch from the Editor.";
+                document.getElementById('cinematicIntro').classList.add('show-text');
+            }
+        };
+    </script>
+</body>
+</html>

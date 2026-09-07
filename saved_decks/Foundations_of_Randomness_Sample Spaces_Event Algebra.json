@@ -1,0 +1,497 @@
+{
+  "project_title": "Foundations of Randomness, Sample Spaces & Event Algebra",
+  "subject": "Module-1: Probability (CSE & Applied Mathematics)",
+  "author": "Prof. Locus",
+  "theme": "locus_cinematic",
+  "slides": [
+    {
+      "id": "slide_01",
+      "title": "The Illusion of Determinism",
+      "subtitle": "Hardware Non-Determinism & Stochastic System Failures",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "In high-reliability computing, physical processes introduce unpredictable, stochastic behavior into deterministic silicon.",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Single Event Upset (SEU):** High-energy cosmic neutrons flip memory bitstates in satellite and cloud server RAM.",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Network Jitter & Collisions:** Asynchronous arrival times in packet routers introduce timing noise.",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "To build resilient software, we must formalize non-deterministic failure states using the rigorous framework of **Probability Theory**.",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet autoRotY = 0;\nlet isDragging = false, startX = 0, startY = 0, startTime = 0;\nlet dragRotX = 0.5, dragRotY = 0.6;\n\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); isDragging = true; });\nwindow.addEventListener('pointermove', e => {\n  if (!isDragging) return;\n  dragRotY += (e.clientX - startX) * 0.008;\n  dragRotX += (e.clientY - startY) * 0.008;\n  startX = e.clientX; startY = e.clientY;\n});\nwindow.addEventListener('pointerup', e => {\n  isDragging = false;\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nfunction project(x, y, z) {\n  let cx = Math.cos(dragRotX), sx = Math.sin(dragRotX);\n  let cy = Math.cos(dragRotY + autoRotY), sy = Math.sin(dragRotY + autoRotY);\n  let x1 = x * cy + z * sy;\n  let z1 = -x * sy + z * cy;\n  let y1 = y * cx - z1 * sx;\n  let z2 = y * sx + z1 * cx;\n  let f = 500 / (z2 + 500);\n  return { x: 400 + x1 * f, y: 300 - y1 * f, scale: f };\n}\n\nlet particles = [];\nfor(let i=0; i<30; i++) {\n  particles.push({ x: (Math.random()-0.5)*200, y: 150 + Math.random()*100, z: (Math.random()-0.5)*200, speed: 2 + Math.random()*4 });\n}\nlet gridFlips = {};\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n  if(!isDragging) autoRotY += 0.003;\n\n  ctx.lineWidth = 1;\n  for(let i=-5; i<=5; i++) {\n    let p1 = project(i*30, 0, -150);\n    let p2 = project(i*30, 0, 150);\n    ctx.strokeStyle = '#334155';\n    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();\n\n    let p3 = project(-150, 0, i*30);\n    let p4 = project(150, 0, i*30);\n    ctx.beginPath(); ctx.moveTo(p3.x, p3.y); ctx.lineTo(p4.x, p4.y); ctx.stroke();\n  }\n\n  if(currentStep >= 2) {\n    particles.forEach(p => {\n      p.y -= p.speed;\n      if(p.y < 0) {\n        p.y = 200;\n        p.x = (Math.random()-0.5)*260;\n        p.z = (Math.random()-0.5)*260;\n        let gx = Math.floor((p.x+150)/30);\n        let gz = Math.floor((p.z+150)/30);\n        if(gx>=0 && gx<10 && gz>=0 && gz<10) {\n          let key = gx + '_' + gz;\n          gridFlips[key] = (gridFlips[key] || 0) + 1;\n        }\n      }\n      let pp = project(p.x, p.y, p.z);\n      ctx.fillStyle = '#f43f5e';\n      ctx.beginPath(); ctx.arc(pp.x, pp.y, 3*pp.scale, 0, Math.PI*2); ctx.fill();\n    });\n  }\n\n  Object.keys(gridFlips).forEach(k => {\n    let parts = k.split('_');\n    let gx = parseInt(parts[0])*30 - 135;\n    let gz = parseInt(parts[1])*30 - 135;\n    let gp = project(gx, 0, gz);\n    ctx.fillStyle = gridFlips[k] > 3 ? '#f43f5e' : '#fbbf24';\n    ctx.beginPath(); ctx.arc(gp.x, gp.y, 5*gp.scale, 0, Math.PI*2); ctx.fill();\n  });\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"3D Silicon Wafer | Cosmic Ray Impact Simulation\", 20, 30);\n  ctx.fillStyle = '#10b981';\n  let totalFlips = Object.values(gridFlips).reduce((a,b)=>a+b,0);\n  ctx.fillText(`Bit-Flip Errors Detected: ${totalFlips}`, 20, 55);\n  ctx.fillStyle = '#64748b';\n  ctx.fillText(\"Step \" + currentStep + \": \" + (currentStep===1?\"Baseline Silicon Matrix\": currentStep===2?\"Cosmic Particle Radiation Active\":\"Bit-Flip Fault Accumulation\"), 20, 570);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_02",
+      "title": "The Random Experiment Formalism",
+      "subtitle": "Mathematical Definition of Trial & Non-Determinism",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "A **Random Experiment** $\\mathcal{E}$ is any repeatable procedure whose outcome cannot be predicted with certainty prior to execution.",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Property 1:** The set of all possible individual outcomes is known in advance.",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Property 2:** Any single execution (a **trial**) yields a single outcome that cannot be known prior to completion.",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Property 3:** The experiment can be repeated under identical conditions.",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet startX = 0, startY = 0, startTime = 0;\n\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nlet balls = [];\nlet bins = new Array(11).fill(0);\n\nfunction spawnBall() {\n  balls.push({ x: 400, y: 50, vx: 0, vy: 0 });\n}\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  let spawnRate = currentStep === 1 ? 0 : currentStep === 2 ? 0.08 : 0.3;\n  if (Math.random() < spawnRate) spawnBall();\n\n  ctx.fillStyle = '#00E5FF';\n  let rows = 8;\n  for (let r = 0; r < rows; r++) {\n    let startXRow = 400 - (r * 20);\n    for (let c = 0; c <= r; c++) {\n      let px = startXRow + c * 40;\n      let py = 100 + r * 35;\n      ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI*2); ctx.fill();\n    }\n  }\n\n  for (let i = balls.length - 1; i >= 0; i--) {\n    let b = balls[i];\n    b.vy += 0.2;\n    b.y += b.vy;\n    b.x += b.vx;\n\n    let r = Math.floor((b.y - 100) / 35);\n    if (r >= 0 && r < rows && b.y > 100 + r * 35 && b.y < 100 + r * 35 + 10) {\n      b.vx += (Math.random() - 0.5) * 1.5;\n    }\n\n    if (b.y > 400) {\n      let binIdx = Math.floor((b.x - 180) / 40);\n      binIdx = Math.max(0, Math.min(10, binIdx));\n      bins[binIdx]++;\n      balls.splice(i, 1);\n    } else {\n      ctx.fillStyle = '#fbbf24';\n      ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, Math.PI*2); ctx.fill();\n    }\n  }\n\n  let maxCount = Math.max(1, Math.max(...bins));\n  for (let i = 0; i < 11; i++) {\n    let bx = 200 + i * 40;\n    let h = (bins[i] / maxCount) * 120;\n    ctx.fillStyle = '#10b981';\n    ctx.fillRect(bx - 15, 550 - h, 30, h);\n    ctx.strokeStyle = '#334155';\n    ctx.strokeRect(bx - 15, 430, 30, 120);\n  }\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"Galton Board Random Experiment Simulation\", 20, 30);\n  ctx.fillStyle = '#10b981';\n  ctx.fillText(`Total Trial Samples Generated: ${bins.reduce((a,b)=>a+b,0)}`, 20, 55);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_03",
+      "title": "Defining the Universe: Sample Space",
+      "subtitle": "Discrete Finite, Discrete Infinite, and Continuous Manifolds",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "The **Sample Space** $\\Omega$ (or $S$) is the set of all possible elementary outcomes $\\omega$ of a random experiment.",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\Omega = \\{ \\omega_1, \\omega_2, \\omega_3, \\dots \\}",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Discrete Finite:** Flip 3 bits $\\implies \\Omega = \\{000, 001, \\dots, 111\\}, |\\Omega| = 2^3 = 8$.",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Discrete Infinite:** Number of packet retries until success $\\implies \\Omega = \\{1, 2, 3, \\dots\\}$.",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Continuous Manifold:** Voltage fluctuations in CPU clock line $\\implies \\Omega = [V_{min}, V_{max}] \\subset \\mathbb{R}$.",
+          "reveal_step": 5,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet autoRotY = 0;\nlet isDragging = false, startX = 0, startY = 0, startTime = 0;\nlet dragRotX = 0.4, dragRotY = 0.5;\n\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); isDragging = true; });\nwindow.addEventListener('pointermove', e => {\n  if (!isDragging) return;\n  dragRotY += (e.clientX - startX) * 0.008;\n  dragRotX += (e.clientY - startY) * 0.008;\n  startX = e.clientX; startY = e.clientY;\n});\nwindow.addEventListener('pointerup', e => {\n  isDragging = false;\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nfunction project(x, y, z) {\n  let cx = Math.cos(dragRotX), sx = Math.sin(dragRotX);\n  let cy = Math.cos(dragRotY + autoRotY), sy = Math.sin(dragRotY + autoRotY);\n  let x1 = x * cy + z * sy;\n  let z1 = -x * sy + z * cy;\n  let y1 = y * cx - z1 * sx;\n  let z2 = y * sx + z1 * cx;\n  let f = 500 / (z2 + 500);\n  return { x: 400 + x1 * f, y: 300 - y1 * f, scale: f };\n}\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n  if(!isDragging) autoRotY += 0.003;\n\n  let s = 120;\n  let vertices = [\n    [-s,-s,-s], [s,-s,-s], [s,s,-s], [-s,s,-s],\n    [-s,-s,s],  [s,-s,s],  [s,s,s],  [-s,s,s]\n  ];\n  let edges = [\n    [0,1],[1,2],[2,3],[3,0],\n    [4,5],[5,6],[6,7],[7,4],\n    [0,4],[1,5],[2,6],[3,7]\n  ];\n\n  ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 2;\n  edges.forEach(e => {\n    let p1 = project(...vertices[e[0]]);\n    let p2 = project(...vertices[e[1]]);\n    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();\n  });\n\n  if (currentStep === 1) {\n    ctx.fillStyle = '#fbbf24';\n    for(let x=-1; x<=1; x++) {\n      for(let y=-1; y<=1; y++) {\n        for(let z=-1; z<=1; z++) {\n          let p = project(x*s, y*s, z*s);\n          ctx.beginPath(); ctx.arc(p.x, p.y, 6*p.scale, 0, Math.PI*2); ctx.fill();\n        }\n      }\n    }\n  } else {\n    ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';\n    let pTop = project(0,0,0);\n    ctx.beginPath(); ctx.arc(pTop.x, pTop.y, 100*pTop.scale, 0, Math.PI*2); ctx.fill();\n\n    ctx.fillStyle = '#10b981';\n    for(let i=0; i<150; i++) {\n      let rx = (Math.sin(i*1.1))*s*0.8;\n      let ry = (Math.cos(i*1.7))*s*0.8;\n      let rz = (Math.sin(i*2.3))*s*0.8;\n      let p = project(rx, ry, rz);\n      ctx.beginPath(); ctx.arc(p.x, p.y, 3*p.scale, 0, Math.PI*2); ctx.fill();\n    }\n  }\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"3D State Space Explorer: \" + (currentStep===1 ? \"Discrete Lattice Sample Space\" : \"Continuous Manifold Volume\"), 20, 30);\n  ctx.fillStyle = '#64748b';\n  ctx.fillText(\"Drag to rotate 360° | Click slide to toggle discrete vs. continuous\", 20, 570);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_04",
+      "title": "Events as Measurable Subsets",
+      "subtitle": "Formalizing Events within the Power Set",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "An **Event** $E$ is any subset of the sample space $\\Omega$, formally belonging to the event space $\\mathcal{F} \\subseteq \\mathcal{P}(\\Omega)$.",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "E \\subseteq \\Omega \\implies E \\in \\mathcal{F}",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Elementary Event:** A single outcome subset $E = \\{\\omega_i\\}$.",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Certain Event:** The entire space $\\Omega$; it must occur in every trial.",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Impossible Event:** The empty set $\\emptyset$; contains zero outcomes.",
+          "reveal_step": 5,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet startX = 0, startY = 0, startTime = 0;\n\nlet points = [];\nfor(let i=0; i<25; i++) {\n  points.push({ x: 150 + Math.random()*500, y: 150 + Math.random()*300, id: i });\n}\n\nlet box = { x: 250, y: 200, w: 300, h: 200 };\nlet isBoxDragging = false, dragOffX = 0, dragOffY = 0;\n\nwindow.addEventListener('pointerdown', e => {\n  startX = e.clientX; startY = e.clientY; startTime = Date.now();\n  if(e.clientX >= box.x && e.clientX <= box.x + box.w && e.clientY >= box.y && e.clientY <= box.y + box.h) {\n    isBoxDragging = true;\n    dragOffX = e.clientX - box.x;\n    dragOffY = e.clientY - box.y;\n  }\n});\n\nwindow.addEventListener('pointermove', e => {\n  if(isBoxDragging) {\n    box.x = e.clientX - dragOffX;\n    box.y = e.clientY - dragOffY;\n  }\n});\n\nwindow.addEventListener('pointerup', e => {\n  isBoxDragging = false;\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;\n  ctx.strokeRect(100, 100, 600, 400);\n  ctx.fillStyle = '#64748b'; ctx.font = '18px monospace';\n  ctx.fillText(\"Universal Sample Space (Ω)\", 120, 130);\n\n  ctx.fillStyle = 'rgba(0, 229, 255, 0.15)';\n  ctx.fillRect(box.x, box.y, box.w, box.h);\n  ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3;\n  ctx.strokeRect(box.x, box.y, box.w, box.h);\n  ctx.fillStyle = '#00E5FF';\n  ctx.fillText(\"Event Subset E\", box.x + 15, box.y + 30);\n\n  let countE = 0;\n  points.forEach(p => {\n    let inside = (p.x >= box.x && p.x <= box.x + box.w && p.y >= box.y && p.y <= box.y + box.h);\n    if(inside) countE++;\n    ctx.fillStyle = inside ? '#10b981' : '#fbbf24';\n    ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI*2); ctx.fill();\n  });\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"Events as Subsets: Drag the cyan Event E region\", 20, 30);\n  ctx.fillStyle = '#10b981';\n  ctx.fillText(`Outcomes in Event E |E| = ${countE} / 25 | Ratio = ${(countE/25).toFixed(2)}`, 20, 55);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_05",
+      "title": "Event Algebra: Set Operations",
+      "subtitle": "Unions, Intersections, and Complements",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Operations on events map directly to set-theoretic operations on the sample space $\\Omega$:",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Union ($A \\cup B$):** Event $A$ OR Event $B$ occurs (at least one occurs).",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Intersection ($A \\cap B$):** Event $A$ AND Event $B$ occur simultaneously.",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Complement ($A^c$ or $A'$):** Event $A$ does NOT occur.",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Mutually Exclusive:** $A \\cap B = \\emptyset$. They cannot co-occur.",
+          "reveal_step": 5,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet startX = 0, startY = 0, startTime = 0;\n\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  let cA = { x: 330, y: 300, r: 120 };\n  let cB = { x: 470, y: 300, r: 120 };\n\n  ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3;\n  ctx.beginPath(); ctx.arc(cA.x, cA.y, cA.r, 0, Math.PI*2); ctx.stroke();\n  ctx.strokeStyle = '#10b981';\n  ctx.beginPath(); ctx.arc(cB.x, cB.y, cB.r, 0, Math.PI*2); ctx.stroke();\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '20px monospace';\n  ctx.fillText(\"A\", cA.x - 50, cA.y);\n  ctx.fillStyle = '#10b981';\n  ctx.fillText(\"B\", cB.x + 40, cB.y);\n\n  ctx.fillStyle = 'rgba(251, 191, 36, 0.4)';\n  if (currentStep === 1) {\n    ctx.beginPath(); ctx.arc(cA.x, cA.y, cA.r, 0, Math.PI*2); ctx.fill();\n    ctx.beginPath(); ctx.arc(cB.x, cB.y, cB.r, 0, Math.PI*2); ctx.fill();\n  } else if (currentStep === 2) {\n    ctx.save();\n    ctx.beginPath(); ctx.arc(cA.x, cA.y, cA.r, 0, Math.PI*2); ctx.clip();\n    ctx.beginPath(); ctx.arc(cB.x, cB.y, cB.r, 0, Math.PI*2); ctx.fill();\n    ctx.restore();\n  } else if (currentStep >= 3) {\n    ctx.save();\n    ctx.beginPath(); ctx.arc(cA.x, cA.y, cA.r, 0, Math.PI*2); ctx.fill();\n    ctx.globalCompositeOperation = 'destination-out';\n    ctx.beginPath(); ctx.arc(cB.x, cB.y, cB.r, 0, Math.PI*2); ctx.fill();\n    ctx.restore();\n  }\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"Set Operations Visualizer\", 20, 30);\n  ctx.fillStyle = '#fbbf24'; ctx.font = '18px monospace';\n  let modeText = currentStep === 1 ? \"A ∪ B (Union: A OR B)\" : currentStep === 2 ? \"A ∩ B (Intersection: A AND B)\" : \"A \\\\ B (Difference: A AND NOT B)\";\n  ctx.fillText(\"Active Mode: \" + modeText, 20, 60);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_06",
+      "title": "De Morgan's Laws in System Reliability",
+      "subtitle": "Duality of Series vs. Parallel Component Failures",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "De Morgan’s Laws establish fundamental dualities between set unions and intersections:",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "(A \\cup B)^c = A^c \\cap B^c",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "(A \\cap B)^c = A^c \\cup B^c",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "**Reliability Interpretation:** A parallel system fails iff Component A fails AND Component B fails: $(A \\cup B)^c = A^c \\cap B^c$.",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet startX = 0, startY = 0, startTime = 0;\n\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  ctx.strokeStyle = '#334155'; ctx.lineWidth = 4;\n  if (currentStep === 1) {\n    ctx.beginPath(); ctx.moveTo(100, 300); ctx.lineTo(250, 300); ctx.stroke();\n    ctx.strokeRect(250, 260, 100, 80);\n    ctx.beginPath(); ctx.moveTo(350, 300); ctx.lineTo(450, 300); ctx.stroke();\n    ctx.strokeRect(450, 260, 100, 80);\n    ctx.beginPath(); ctx.moveTo(550, 300); ctx.lineTo(700, 300); ctx.stroke();\n\n    ctx.fillStyle = '#00E5FF'; ctx.font = '18px monospace';\n    ctx.fillText(\"Comp A\", 265, 305); ctx.fillText(\"Comp B\", 465, 305);\n    ctx.fillStyle = '#f43f5e';\n    ctx.fillText(\"Series System Fails if A OR B fails: (A ∪ B)\", 120, 180);\n  } else {\n    ctx.beginPath(); ctx.moveTo(100, 300); ctx.lineTo(200, 300); ctx.stroke();\n    ctx.beginPath(); ctx.moveTo(200, 200); ctx.lineTo(200, 400); ctx.stroke();\n\n    ctx.beginPath(); ctx.moveTo(200, 200); ctx.lineTo(300, 200); ctx.stroke();\n    ctx.strokeRect(300, 160, 100, 80);\n    ctx.beginPath(); ctx.moveTo(400, 200); ctx.lineTo(500, 200); ctx.stroke();\n\n    ctx.beginPath(); ctx.moveTo(200, 400); ctx.lineTo(300, 400); ctx.stroke();\n    ctx.strokeRect(300, 360, 100, 80);\n    ctx.beginPath(); ctx.moveTo(400, 400); ctx.lineTo(500, 400); ctx.stroke();\n\n    ctx.beginPath(); ctx.moveTo(500, 200); ctx.lineTo(500, 400); ctx.stroke();\n    ctx.beginPath(); ctx.moveTo(500, 300); ctx.lineTo(700, 300); ctx.stroke();\n\n    ctx.fillStyle = '#10b981'; ctx.font = '18px monospace';\n    ctx.fillText(\"Comp A\", 315, 205); ctx.fillText(\"Comp B\", 315, 405);\n    ctx.fillStyle = '#fbbf24';\n    ctx.fillText(\"Parallel System Fails ONLY if A Fails AND B Fails: (A^c ∩ B^c)\", 80, 100);\n  }\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"De Morgan's Reliability Duality: (A ∪ B)^c = A^c ∩ B^c\", 20, 30);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_07",
+      "title": "Geometric Probability Spaces",
+      "subtitle": "Continuous Probability via Area Ratios",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "When sample spaces are uncountably infinite continuous regions $\\Omega \\subset \\mathbb{R}^n$, individual points have zero probability $P(\\{\\omega\\}) = 0$.",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Probability is calculated using geometric measures (Length, Area, Volume):",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(E) = \\frac{\\text{Area}(E)}{\\text{Area}(\\Omega)}",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "In the Monte Carlo simulation (right), random dart throws approximate this ratio empirically.",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet startX = 0, startY = 0, startTime = 0;\n\nlet darts = [];\n\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  for(let i=0; i<(currentStep===1?2:15); i++) {\n    let dx = 200 + Math.random()*400;\n    let dy = 100 + Math.random()*400;\n    let hit = Math.hypot(dx-400, dy-300) <= 120;\n    darts.push({ x: dx, y: dy, hit: hit });\n  }\n\n  ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;\n  ctx.strokeRect(200, 100, 400, 400);\n\n  ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3;\n  ctx.beginPath(); ctx.arc(400, 300, 120, 0, Math.PI*2); ctx.stroke();\n\n  darts.forEach(d => {\n    ctx.fillStyle = d.hit ? '#10b981' : '#f43f5e';\n    ctx.beginPath(); ctx.arc(d.x, d.y, 3, 0, Math.PI*2); ctx.fill();\n  });\n\n  let hits = darts.filter(d => d.hit).length;\n  let total = darts.length;\n  let empirical = total > 0 ? (hits/total).toFixed(4) : \"0.0000\";\n  let theoretical = (Math.PI * 120 * 120 / (400 * 400)).toFixed(4);\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"Geometric Probability Engine: P(E) = Area(E) / Area(Ω)\", 20, 30);\n  ctx.fillStyle = '#10b981';\n  ctx.fillText(`Empirical Ratio: ${hits}/${total} = ${empirical} | Theoretical: π(120)^2 / 400^2 = ${theoretical}`, 20, 55);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_08",
+      "title": "Interactive Set Manipulation Engine",
+      "subtitle": "Real-time Spatial Intersection Mechanics",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Interactive Workbench: Drag Sets $A$ (cyan) and $B$ (green) across the universal canvas $\\Omega$.",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "When sets separate beyond distance $r_A + r_B$, intersection drops to zero: $A \\cap B = \\emptyset$.",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "As sets overlap, the golden region highlights joint probability density $P(A \\cap B)$.",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet startX = 0, startY = 0, startTime = 0;\n\nlet setA = { x: 350, y: 300, r: 130 };\nlet setB = { x: 450, y: 300, r: 130 };\nlet isDraggingA = false, isDraggingB = false;\n\nwindow.addEventListener('pointerdown', e => {\n  startX = e.clientX; startY = e.clientY; startTime = Date.now();\n  if(Math.hypot(e.clientX - setA.x, e.clientY - setA.y) < setA.r) isDraggingA = true;\n  else if(Math.hypot(e.clientX - setB.x, e.clientY - setB.y) < setB.r) isDraggingB = true;\n});\n\nwindow.addEventListener('pointermove', e => {\n  if(isDraggingA) { setA.x = e.clientX; setA.y = e.clientY; }\n  if(isDraggingB) { setB.x = e.clientX; setB.y = e.clientY; }\n});\n\nwindow.addEventListener('pointerup', e => {\n  isDraggingA = false; isDraggingB = false;\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;\n  ctx.strokeRect(80, 80, 640, 440);\n\n  ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3;\n  ctx.beginPath(); ctx.arc(setA.x, setA.y, setA.r, 0, Math.PI*2); ctx.stroke();\n  ctx.strokeStyle = '#10b981';\n  ctx.beginPath(); ctx.arc(setB.x, setB.y, setB.r, 0, Math.PI*2); ctx.stroke();\n\n  ctx.save();\n  ctx.beginPath(); ctx.arc(setA.x, setA.y, setA.r, 0, Math.PI*2); ctx.clip();\n  ctx.beginPath(); ctx.arc(setB.x, setB.y, setB.r, 0, Math.PI*2);\n  ctx.fillStyle = 'rgba(251, 191, 36, 0.4)'; ctx.fill();\n  ctx.restore();\n\n  let d = Math.hypot(setA.x - setB.x, setA.y - setB.y);\n  let isDisjoint = d > (setA.r + setB.r);\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"Interactive Set Engine: Drag Sets A & B\", 20, 30);\n  ctx.fillStyle = isDisjoint ? '#f43f5e' : '#fbbf24';\n  ctx.fillText(isDisjoint ? \"Sets are Mutually Exclusive! P(A ∩ B) = 0\" : `Sets Overlap! Distance d = ${d.toFixed(1)}px`, 20, 55);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_09",
+      "title": "Engineering Application: Router Packet Faults",
+      "subtitle": "Stochastic Modeling of Network Buffer Drops",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Consider a 4-node network router mesh. Let event $E_i$ be the event that link $i$ drops a packet due to buffer overflow.",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "The sample space $\\Omega = \\{0, 1\\}^4$ contains $2^4 = 16$ binary link state vectors.",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Event $A$: Total transmission success (zero dropped packets) $\\implies A = \\{(0,0,0,0)\\}$.",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Event $B$: At least one link drops a packet $\\implies B = A^c$.",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet startX = 0, startY = 0, startTime = 0;\n\nlet nodes = [\n  { id: 'R1', x: 200, y: 200 }, { id: 'R2', x: 600, y: 200 },\n  { id: 'R3', x: 200, y: 400 }, { id: 'R4', x: 600, y: 400 }\n];\nlet packets = [];\n\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  ctx.strokeStyle = '#334155'; ctx.lineWidth = 3;\n  ctx.beginPath(); ctx.moveTo(nodes[0].x, nodes[0].y); ctx.lineTo(nodes[1].x, nodes[1].y); ctx.stroke();\n  ctx.beginPath(); ctx.moveTo(nodes[0].x, nodes[0].y); ctx.lineTo(nodes[2].x, nodes[2].y); ctx.stroke();\n  ctx.beginPath(); ctx.moveTo(nodes[1].x, nodes[1].y); ctx.lineTo(nodes[3].x, nodes[3].y); ctx.stroke();\n  ctx.beginPath(); ctx.moveTo(nodes[2].x, nodes[2].y); ctx.lineTo(nodes[3].x, nodes[3].y); ctx.stroke();\n\n  if(Math.random() < 0.1) {\n    packets.push({ x: nodes[0].x, y: nodes[0].y, targetX: nodes[1].x, targetY: nodes[1].y, progress: 0 });\n  }\n\n  for(let i=packets.length-1; i>=0; i--) {\n    let p = packets[i];\n    p.progress += 0.02;\n    let px = p.x + (p.targetX - p.x)*p.progress;\n    let py = p.y + (p.targetY - p.y)*p.progress;\n\n    if(currentStep >= 2 && p.progress > 0.5 && Math.random() < 0.05) {\n      ctx.fillStyle = '#f43f5e'; ctx.font = '14px monospace';\n      ctx.fillText(\"DROP!\", px, py);\n      packets.splice(i, 1);\n      continue;\n    }\n\n    if(p.progress >= 1) packets.splice(i, 1);\n    else {\n      ctx.fillStyle = '#00E5FF';\n      ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI*2); ctx.fill();\n    }\n  }\n\n  nodes.forEach(n => {\n    ctx.fillStyle = '#10b981';\n    ctx.beginPath(); ctx.arc(n.x, n.y, 25, 0, Math.PI*2); ctx.fill();\n    ctx.fillStyle = '#0f172a'; ctx.font = 'bold 16px monospace';\n    ctx.fillText(n.id, n.x-10, n.y+5);\n  });\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"4-Node Router Topology: Packet Fault Modeling\", 20, 30);\n  ctx.fillStyle = currentStep === 1 ? '#10b981' : '#f43f5e';\n  ctx.fillText(\"Network State: \" + (currentStep === 1 ? \"Ideal Transmission\" : \"Buffer Congestion (Packet Drops Active)\"), 20, 55);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_10",
+      "title": "Algorithmic Encoding: Bitmask Register ALU",
+      "subtitle": "Executing Set Operations via CPU Bitwise Logic",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "In high-performance software engines, event sets are represented as 64-bit integer bitmasks.",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Intersection ($A \\cap B$):** Computed via single-cycle Bitwise `AND` (`A & B`).",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Union ($A \\cup B$):** Computed via single-cycle Bitwise `OR` (`A | B`).",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Complement ($A^c$):** Computed via Bitwise `NOT` (`~A`).",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1;\nlet startX = 0, startY = 0, startTime = 0;\n\nlet maskA = 0b1100101011010011;\nlet maskB = 0b1011100101100110;\n\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => {\n  if (Math.abs(e.clientX - startX) < 10 && Math.abs(e.clientY - startY) < 10 && Date.now() - startTime < 300) {\n    window.parent.postMessage({ action: e.clientX < window.innerWidth / 3 ? 'prevStep' : 'nextStep' }, '*');\n  }\n});\n\nwindow.addEventListener('message', e => {\n  if (e.data && typeof e.data.currentStep !== 'undefined') { currentStep = e.data.currentStep; }\n});\n\nfunction drawBitRow(y, label, val, color) {\n  ctx.fillStyle = color; ctx.font = '16px monospace';\n  ctx.fillText(label, 50, y + 20);\n  for(let i=15; i>=0; i--) {\n    let bit = (val >> i) & 1;\n    let x = 200 + (15 - i) * 32;\n    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;\n    ctx.strokeRect(x, y, 28, 30);\n    ctx.fillStyle = bit ? color : '#1e293b';\n    ctx.fillRect(x+2, y+2, 24, 26);\n    ctx.fillStyle = bit ? '#0f172a' : '#64748b'; ctx.font = 'bold 14px monospace';\n    ctx.fillText(bit, x+10, y+20);\n  }\n}\n\nfunction loop() {\n  requestAnimationFrame(loop);\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n\n  drawBitRow(150, \"Event A Mask :\", maskA, '#00E5FF');\n  drawBitRow(220, \"Event B Mask :\", maskB, '#10b981');\n\n  if (currentStep === 1) {\n    drawBitRow(340, \"A ∩ B (AND)  :\", maskA & maskB, '#fbbf24');\n  } else if (currentStep >= 2) {\n    drawBitRow(340, \"A ∪ B (OR)   :\", maskA | maskB, '#f43f5e');\n  }\n\n  ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace';\n  ctx.fillText(\"Algorithmic Event Encoding: CPU Bitmask Register ALU\", 20, 30);\n  ctx.fillStyle = '#fbbf24';\n  ctx.fillText(\"Step \" + currentStep + \" ALU Operation: \" + (currentStep===1 ? \"Bitwise AND for Intersection\" : \"Bitwise OR for Union\"), 20, 55);\n}\nloop();\n</script>\n</body>\n</html>",
+        "autoplay": true,
+        "controls": true
+      }
+    },
+    {
+      "id": "slide_11",
+      "title": "Class 1 Summary & Foundations Vault",
+      "subtitle": "Core Mathematical Mapping Checklist",
+      "layout": "full_theory",
+      "partition": 1.0,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "**Foundations of Randomness & Event Algebra Summary:**",
+          "reveal_step": 1,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Random Experiment (\\mathcal{E}):** Repeatable trial with non-deterministic single outcomes.",
+          "reveal_step": 2,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Sample Space (\\Omega):** The exhaustive universe of all possible elementary outcomes \\omega.",
+          "reveal_step": 3,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Event Space (\\mathcal{F}):** Measurable subsets E \\subseteq \\Omega; closed under unions and complements.",
+          "reveal_step": 4,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**De Morgan Duality:** (A \\cup B)^c = A^c \\cap B^c; critical for software system fault analysis.",
+          "reveal_step": 5,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": null
+    }
+  ]
+}

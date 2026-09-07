@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locus Studio - Visual Deck Builder</title>
+    <link rel="stylesheet" href="/static/presentation.css">
+    <style>
+        .editor-layout { display: flex; height: calc(100vh - 50px); overflow: hidden; background: var(--bg-dark); }
+        
+        /* Left Sidebar: Slide Navigation */
+        .slide-sidebar { width: 280px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .slide-list { flex-grow: 1; overflow-y: auto; padding: 15px; list-style: none; margin: 0; height: 50%; }
+        .slide-thumbnail { background: var(--bg-dark); border: 1px solid var(--border); padding: 12px; margin-bottom: 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        
+        .media-list { flex-grow: 1; overflow-y: auto; padding: 15px; list-style: none; margin: 0; height: 50%; border-top: 1px solid var(--border); }
+        .media-asset-card { background: var(--bg-dark); border: 1px solid #0ea5e9; padding: 10px; margin-bottom: 10px; border-radius: 6px; }
+        .media-asset-title { font-size: 12px; font-family: monospace; color: #0ea5e9; margin-bottom: 8px; word-break: break-all; }
+        .btn-render { width: 100%; padding: 6px; font-size: 11px; font-weight: bold; background: #0ea5e9; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-render:hover { background: #0284c7; }
+        .slide-thumbnail:hover { border-color: var(--text-muted); }
+        .slide-thumbnail.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+        .slide-thumbnail-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .slide-thumbnail-meta { font-size: 11px; color: var(--text-muted); }
+        .add-slide-btn { background: transparent; border: 1px dashed var(--border); color: var(--text-muted); width: 100%; padding: 10px; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+        .add-slide-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+
+        /* Center: Visual Editor */
+        .visual-editor { flex-grow: 1; overflow-y: auto; padding: 30px; display: flex; justify-content: center; }
+        .editor-container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
+        .form-control { background: var(--bg-panel); color: white; border: 1px solid var(--border); padding: 12px; border-radius: 6px; font-family: inherit; font-size: 14px; }
+        .form-control:focus { outline: none; border-color: var(--accent); }
+        
+        .fragment-block { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 15px; display: flex; gap: 15px; align-items: flex-start; }
+        .fragment-step-badge { background: var(--bg-dark); border: 1px solid var(--border); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold; flex-shrink: 0; }
+        .fragment-content { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+        .fragment-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .fragment-type-select { background: var(--bg-dark); border: 1px solid var(--border); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .fragment-options { display: flex; gap: 15px; align-items: center; font-size: 12px; color: var(--text-muted); }
+        .fragment-options input[type="number"] { width: 60px; padding: 4px; background: var(--bg-dark); border: 1px solid var(--border); color: white; border-radius: 4px; }
+        .delete-btn { background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 4px; }
+        .delete-btn:hover { background: rgba(239, 68, 68, 0.1); border-radius: 4px; }
+
+        .add-fragment-row { display: flex; gap: 10px; margin-top: 10px; }
+        .add-fragment-row button { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; background: var(--bg-dark); color: white; font-size: 13px; transition: 0.2s; }
+        .add-fragment-row button:hover { background: var(--border); }
+        .add-fragment-row button.math-btn { border-color: var(--math-color); color: var(--math-color); }
+        .add-fragment-row button.math-btn:hover { background: rgba(56, 189, 248, 0.1); }
+
+        /* Right Sidebar: Deck Meta & AI */
+        .meta-sidebar { width: 300px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; gap: 20px; overflow-y: auto; }
+        .panel-box { background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; padding: 15px; }
+        .btn-launch { width: 100%; padding: 15px; font-size: 16px; font-weight: bold; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .btn-launch:hover { background: #059669; transform: translateY(-1px); }
+        
+        #saveStatus { font-size: 12px; color: #10b981; text-align: right; opacity: 0; transition: opacity 0.3s; }
+    </style>
+</head>
+<body>
+    <header class="top-nav">
+        <div class="brand">Locus Studio : Visual Builder</div>
+        <div class="controls" style="display: flex; align-items: center; gap: 15px;">
+            <span id="saveStatus">Saved</span>
+            <button onclick="document.getElementById('fileUpload').click()">📁 Load Deck (.json)</button>
+            <input type="file" id="fileUpload" style="display: none;" onchange="loadDeckFile(event)" accept=".json">
+            <button onclick="saveDeck()" class="accent-btn">💾 Save (Ctrl+S)</button>
+        </div>
+    </header>
+
+    <div class="editor-layout">
+        <!-- Left: Slides List -->
+        <aside class="slide-sidebar">
+            <div style="padding: 15px; border-bottom: 1px solid var(--border); font-weight: bold; font-size: 13px; color: var(--text-muted); text-transform: uppercase;">
+                Slides
+            </div>
+            <ul class="slide-list" id="slideListUi"></ul>
+            <div style="padding: 15px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+                <button class="add-slide-btn" onclick="addNewSlide()" style="margin-top: 0;">+ Add New Slide</button>
+            </div>
+            <div style="padding: 15px; border-bottom: 1px solid var(--border); font-weight: bold; font-size: 13px; color: #0ea5e9; text-transform: uppercase;">
+                AI Media Assets
+            </div>
+            <ul class="media-list" id="mediaListUi"></ul>
+        </aside>
+
+        <!-- Center: Slide Visual Form -->
+        <main class="visual-editor">
+            <div class="editor-container" id="editorContainer" style="display: none;">
+                
+                <div class="form-group">
+                    <label>Slide Title</label>
+                    <input type="text" id="slideTitle" class="form-control" style="font-size: 24px; font-weight: bold;" oninput="updateCurrentSlide('title', this.value)">
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Layout Split</label>
+                        <select id="slideLayout" class="form-control" onchange="updateCurrentSlide('layout', this.value)">
+                            <option value="split_left_theory">Theory Left / Media Right</option>
+                            <option value="split_right_theory">Media Left / Theory Right</option>
+                            <option value="full_theory">Full Width Theory</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border); width: 100%; margin: 10px 0;">
+                
+                <div class="form-group">
+                    <label>Step-by-Step Fragments</label>
+                    <div id="fragmentsContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                    
+                    <div class="add-fragment-row">
+                        <button onclick="addFragment('text')">+ Text Block</button>
+                        <button class="math-btn" onclick="addFragment('math')">+ Math Formula (LaTeX)</button>
+                        <button onclick="addFragment('bullet')">+ Bullet Point</button>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border); width: 100%; margin: 10px 0;">
+
+                <div class="form-group">
+                    <label>Embedded Media (Video / PDF / Graph)</label>
+                    <div class="fragment-block">
+                        <div class="fragment-content">
+                            <select id="mediaType" class="form-control" onchange="updateMedia('media_type', this.value)">
+                                <option value="none">None</option>
+                                <option value="video">Local Video (MP4)</option>
+                                <option value="pdf">PDF Document</option>
+                                <option value="drive_doc">Google Drive Link</option>
+                                <option value="image">Static Image</option>
+                                <option value="web_widget">Interactive Web Widget (HTML)</option>
+                            </select>
+                            
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="mediaSrc" class="form-control" style="flex-grow: 1;" placeholder="Source URL or clean_filename.html" oninput="updateMedia('src', this.value)">
+                                <button onclick="generateSlideWidget()" style="background: #10b981; color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap;">✨ Generate Widget</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Right: Meta & AI -->
+        <aside class="meta-sidebar">
+            <div class="form-group">
+                <label>Project File Name</label>
+                <input type="text" id="projectFilename" class="form-control" placeholder="my_lecture.json">
+            </div>
+            
+            <div class="panel-box form-group">
+                <label>Project Title</label>
+                <input type="text" id="projectTitle" class="form-control" oninput="deck.project_title = this.value">
+            </div>
+
+            <div class="panel-box form-group">
+                <label>Author / Professor</label>
+                <input type="text" id="projectAuthor" class="form-control" oninput="deck.author = this.value">
+            </div>
+
+            <div class="panel-box form-group" style="border-color: #0ea5e9;">
+                <label style="color: #0ea5e9;">✨ AI Editor</label>
+                <textarea id="aiPrompt" class="form-control" rows="3" placeholder="Describe the deck you want to generate..."></textarea>
+                
+                <label style="color: var(--text-muted); margin-top: 8px; font-size: 11px;">📎 Attach Reference (Image or Text File)</label>
+                <input type="file" id="aiAttachment" class="form-control" style="font-size: 12px; padding: 8px;" accept="image/*,.txt,.md,.csv,.json">
+                
+                <button onclick="generateWithAI()" style="background: #0ea5e9; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: bold;">Generate Complete Deck</button>
+            </div>
+
+            <div style="flex-grow: 1;"></div>
+            <button class="btn-launch" onclick="launchPresenter()">👨‍🏫 Launch Studio</button>
+        </aside>
+    </div>
+
+    <script>
+        let deck = { project_title: "Untitled Deck", subject: "", author: "Prof. Rakesh Bharati", theme: "locus_cinematic", slides: [] };
+        let currentFilename = "";
+        let activeSlideIndex = -1;
+
+        // --- 1. Load Deck Logic ---
+        function loadDeckFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            currentFilename = file.name;
+            document.getElementById('projectFilename').value = currentFilename;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    deck = JSON.parse(e.target.result);
+                    if (!deck.media_scripts) deck.media_scripts = []; // Backwards compatibility
+                    window.aiGeneratedMedia = deck.media_scripts;
+                    
+                    document.getElementById('projectTitle').value = deck.project_title || "";
+                    document.getElementById('projectAuthor').value = deck.author || "";
+                    renderSidebar();
+                    renderMediaAssets(); // Populate sidebar on load
+                    if(deck.slides.length > 0) selectSlide(0);
+                } catch (err) { alert("Invalid JSON format."); }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // --- 2. Save Deck Logic (Ctrl+S Support) ---
+        async function saveDeck() {
+            let filename = document.getElementById('projectFilename').value.trim();
+            if (!filename) {
+                filename = prompt("Enter a filename to save this deck:", "lecture_1.json");
+                if (!filename) return;
+                document.getElementById('projectFilename').value = filename;
+            }
+
+            try {
+                const response = await fetch('/api/save_deck', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename: filename, deck_data: deck })
+                });
+                
+                if (response.ok) {
+                    showSaveStatus();
+                } else {
+                    alert("Failed to save to backend server.");
+                }
+            } catch(e) {
+                const blob = new Blob([JSON.stringify(deck, null, 2)], { type: "application/json" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename.endsWith('.json') ? filename : filename + '.json';
+                link.click();
+                showSaveStatus();
+            }
+        }
+
+        function showSaveStatus() {
+            const status = document.getElementById('saveStatus');
+            status.style.opacity = 1;
+            setTimeout(() => status.style.opacity = 0, 2000);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveDeck();
+            }
+        });
+
+        // --- 3. UI Rendering Logic ---
+        function renderSidebar() {
+            const list = document.getElementById('slideListUi');
+            list.innerHTML = "";
+            deck.slides.forEach((slide, idx) => {
+                const li = document.createElement('li');
+                li.className = `slide-thumbnail ${idx === activeSlideIndex ? 'active' : ''}`;
+                li.innerHTML = `
+                    <div class="slide-thumbnail-title">${idx + 1}. ${slide.title || 'Untitled'}</div>
+                    <div class="slide-thumbnail-meta">${slide.theory_fragments.length} steps</div>
+                `;
+                li.onclick = () => selectSlide(idx);
+                list.appendChild(li);
+            });
+        }
+
+        function selectSlide(index) {
+            activeSlideIndex = index;
+            renderSidebar();
+            
+            const slide = deck.slides[index];
+            document.getElementById('editorContainer').style.display = 'flex';
+            document.getElementById('slideTitle').value = slide.title || "";
+            document.getElementById('slideLayout').value = slide.layout || "split_left_theory";
+            
+            document.getElementById('mediaType').value = slide.media_panel?.media_type || "none";
+            document.getElementById('mediaSrc').value = slide.media_panel?.src || "";
+
+            renderFragments();
+        }
+
+        function renderFragments() {
+            const container = document.getElementById('fragmentsContainer');
+            container.innerHTML = "";
+            const fragments = deck.slides[activeSlideIndex].theory_fragments;
+
+            fragments.forEach((frag, fIdx) => {
+                const block = document.createElement('div');
+                block.className = "fragment-block";
+                
+                block.innerHTML = `
+                    <div class="fragment-step-badge">${frag.reveal_step || fIdx + 1}</div>
+                    <div class="fragment-content">
+                        <div class="fragment-toolbar">
+                            <select class="fragment-type-select" onchange="updateFragment(${fIdx}, 'type', this.value)">
+                                <option value="text" ${frag.type === 'text' ? 'selected' : ''}>Text</option>
+                                <option value="math" ${frag.type === 'math' ? 'selected' : ''}>LaTeX Math</option>
+                                <option value="bullet" ${frag.type === 'bullet' ? 'selected' : ''}>Bullet</option>
+                                <option value="callout" ${frag.type === 'callout' ? 'selected' : ''}>Callout Box</option>
+                            </select>
+                            
+                            <div class="fragment-options">
+                                <label><input type="checkbox" onchange="updateFragment(${fIdx}, 'clear_screen', this.checked)" ${frag.clear_screen ? 'checked' : ''}> Wipe Screen First</label>
+                                <label>Sync Video (sec): <input type="number" step="0.1" value="${frag.video_sync_time || ''}" onchange="updateFragment(${fIdx}, 'video_sync_time', this.value ? parseFloat(this.value) : null)"></label>
+                            </div>
+
+                            <button class="delete-btn" onclick="deleteFragment(${fIdx})" title="Delete Step">🗑️</button>
+                        </div>
+                        <textarea class="form-control" rows="${frag.type === 'math' ? '2' : '3'}" 
+                                  style="font-family: ${frag.type === 'math' ? 'monospace' : 'inherit'}; color: ${frag.type === 'math' ? 'var(--math-color)' : 'white'};"
+                                  oninput="updateFragment(${fIdx}, 'content', this.value)">${frag.content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</textarea>
+                    </div>
+                `;
+                container.appendChild(block);
+            });
+        }
+
+        // --- 4. Data Mutation Logic ---
+        function updateCurrentSlide(key, value) {
+            if (activeSlideIndex === -1) return;
+            deck.slides[activeSlideIndex][key] = value;
+            if (key === 'title') renderSidebar(); 
+        }
+
+        function updateFragment(index, key, value) {
+            deck.slides[activeSlideIndex].theory_fragments[index][key] = value;
+        }
+
+        function updateMedia(key, value) {
+            if (!deck.slides[activeSlideIndex].media_panel) {
+                deck.slides[activeSlideIndex].media_panel = {};
+            }
+            deck.slides[activeSlideIndex].media_panel[key] = value;
+        }
+
+        function addFragment(type) {
+            if (activeSlideIndex === -1) return;
+            const fragments = deck.slides[activeSlideIndex].theory_fragments;
+            const nextStep = fragments.length > 0 ? Math.max(...fragments.map(f => f.reveal_step)) + 1 : 1;
+            
+            fragments.push({
+                type: type,
+                content: type === 'math' ? "x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}" : "",
+                reveal_step: nextStep,
+                clear_screen: false,
+                video_sync_time: null
+            });
+            renderFragments();
+        }
+
+        function deleteFragment(index) {
+            deck.slides[activeSlideIndex].theory_fragments.splice(index, 1);
+            renderFragments();
+        }
+
+        function addNewSlide() {
+            const newId = 'slide_' + Math.random().toString(36).substr(2, 9);
+            deck.slides.push({
+                id: newId,
+                title: "New Topic",
+                layout: "split_left_theory",
+                partition: 0.5,
+                theory_fragments: [],
+                media_panel: { media_type: "none", src: "" }
+            });
+            selectSlide(deck.slides.length - 1);
+        }
+
+        // --- 5. Bridge to Presenter ---
+        function launchPresenter() {
+            if (deck.slides.length === 0) return alert("Your deck is empty. Add a slide first.");
+            localStorage.setItem('locusCurrentDeck', JSON.stringify(deck));
+            window.open('/present', '_blank');
+        }
+
+        function renderAiMedia(index) {
+            // Send the raw script data to localStorage and open the Media Studio
+            const script = window.aiGeneratedMedia[index];
+            localStorage.setItem('locusMediaAsset', JSON.stringify(script));
+            window.open('/media_editor', '_blank');
+        }
+
+        async function generateWithAI() {
+            const promptText = document.getElementById('aiPrompt').value.trim();
+            if (!promptText) return alert("Please enter a topic description for the AI.");
+            
+            const btn = document.querySelector('button[onclick="generateWithAI()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ Reading Attachment...";
+            btn.style.background = "#64748b";
+            btn.disabled = true;
+
+            // --- Handle File Attachment ---
+            const fileInput = document.getElementById('aiAttachment');
+            const file = fileInput.files[0];
+            let referenceText = "";
+            let referenceImage = "";
+
+            if (file) {
+                try {
+                    if (file.type.startsWith('image/')) {
+                        referenceImage = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = e => resolve(e.target.result);
+                            reader.readAsDataURL(file);
+                        });
+                    } else {
+                        referenceText = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = e => resolve(e.target.result);
+                            reader.readAsText(file);
+                        });
+                    }
+                } catch (err) {
+                    alert("Could not read attached file. Proceeding without it.");
+                }
+            }
+
+            btn.innerText = "⏳ Generating... (This may take a minute)";
+
+            try {
+                const baselineOutline = [
+                    { slide_number: 1, title: "Introduction", pedagogy_focus: "Intuitive motivation", suggested_layout: "full_theory", suggested_media: "none" },
+                    { slide_number: 2, title: "Mathematical Derivation", pedagogy_focus: "Step-by-step algebra", suggested_layout: "split_left_theory", suggested_media: "none" },
+                    { slide_number: 3, title: "Visual Proof", pedagogy_focus: "Geometric verification", suggested_layout: "split_right_theory", suggested_media: "graph_2d" },
+                    { slide_number: 4, title: "Conclusion", pedagogy_focus: "Summary of formulas", suggested_layout: "full_theory", suggested_media: "none" }
+                ];
+
+                const response = await fetch('/api/ai/generate_deck', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        topic: promptText,
+                        approved_outline: baselineOutline,
+                        extra_instructions: "Make the math highly detailed and break equations into small click-to-reveal steps.",
+                        theme: deck.theme || "locus_cinematic",
+                        reference_text: referenceText,
+                        reference_image: referenceImage
+                    })
+                });
+
+                if (!response.ok) throw new Error("AI Generation failed on the backend.");
+
+                const aiResponse = await response.json();
+                
+                deck = aiResponse.deck;
+                document.getElementById('projectTitle').value = deck.project_title || "";
+                document.getElementById('projectAuthor').value = deck.author || "Prof. Rakesh Bharati";
+                
+                renderSidebar();
+                if(deck.slides.length > 0) selectSlide(0);
+                
+                // Bind scripts to the deck so they save in the single JSON
+                deck.media_scripts = aiResponse.media_scripts || [];
+                window.aiGeneratedMedia = deck.media_scripts;
+                renderMediaAssets();
+
+                alert("✨ AI Generation Complete! Check the Media Assets panel to render your widgets.");
+            } catch (error) {
+                console.error(error);
+                alert("Error connecting to AI backend. Check your terminal for Python errors.");
+            } finally {
+                btn.innerText = originalText;
+                btn.style.background = "#0ea5e9";
+                btn.disabled = false;
+            }
+        }
+        async function generateSlideWidget() {
+            if (activeSlideIndex === -1) return alert("Please select a slide first.");
+            
+            const slide = deck.slides[activeSlideIndex];
+            if (slide.media_panel?.media_type !== "web_widget") {
+                return alert("Please set the media type to 'Interactive Web Widget (HTML)' first.");
+            }
+
+            // Ensure there is a filename. If not, auto-generate one.
+            let filename = document.getElementById('mediaSrc').value.trim();
+            if (!filename) {
+                filename = `widget_${slide.id}.html`;
+                document.getElementById('mediaSrc').value = filename;
+                updateMedia('src', filename);
+            }
+
+            const btn = document.querySelector('button[onclick="generateSlideWidget()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ Coding...";
+            btn.style.background = "#64748b";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/ai/generate_widget', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slide: slide, theme: deck.theme || "locus_cinematic" })
+                });
+
+                if (!response.ok) throw new Error("Failed to generate widget on backend.");
+
+                const generatedScript = await response.json();
+                
+                // Force the filename to match whatever is in the input box
+                generatedScript.filename = filename;
+
+                if (!deck.media_scripts) deck.media_scripts = [];
+                
+                // If the asset already exists, overwrite it. Otherwise, add a new one.
+                const existingIdx = deck.media_scripts.findIndex(s => s.filename === filename);
+                if (existingIdx !== -1) {
+                    deck.media_scripts[existingIdx] = generatedScript;
+                } else {
+                    deck.media_scripts.push(generatedScript);
+                }
+
+                window.aiGeneratedMedia = deck.media_scripts;
+                renderMediaAssets();
+
+                alert(`✨ Successfully generated and saved to ${filename}!`);
+            } catch (error) {
+                console.error(error);
+                alert("Error connecting to AI backend.");
+            } finally {
+                btn.innerText = originalText;
+                btn.style.background = "#10b981";
+                btn.disabled = false;
+            }
+        }
+
+
+        function renderMediaAssets() {
+            const mediaList = document.getElementById('mediaListUi');
+            mediaList.innerHTML = "";
+            (window.aiGeneratedMedia || []).forEach((script, idx) => {
+                const li = document.createElement('li');
+                li.className = "media-asset-card";
+                li.innerHTML = `
+                    <div class="media-asset-title">📄 ${script.filename}</div>
+                    <button class="btn-render" onclick="renderAiMedia(${idx})">⬇️ Edit & Render in Studio</button>
+                `;
+                mediaList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>

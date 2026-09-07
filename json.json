@@ -1,0 +1,29 @@
+{
+  "project_title": "Ordinary Differential Equations - Variable Separable",
+  "theme": "dark_modern",
+  "slides": [
+    {
+      "id": "slide_1",
+      "layout": "split_horizontal",
+      "partition": 0.5,
+      "left_panel": {
+        "type": "theory",
+        "title": "General Solution Form",
+        "fragments": [
+          { "type": "text", "content": "Consider a first-order differential equation:" },
+          { "type": "math", "content": "\\frac{dy}{dx} = g(x)h(y)", "highlight": true },
+          { "type": "text", "content": "Separate variables by algebraic division:" },
+          { "type": "math", "content": "\\frac{1}{h(y)} \\, dy = g(x) \\, dx" },
+          { "type": "math", "content": "\\int \\frac{1}{h(y)} \\, dy = \\int g(x) \\, dx + C" }
+        ]
+      },
+      "right_panel": {
+        "type": "media",
+        "media_type": "video",
+        "src": "/media/separation_geometry.mp4",
+        "autoplay": false,
+        "controls": true
+      }
+    }
+  ]
+}
