@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 from typing import List, Optional, Literal, Union, Dict, Any
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -272,6 +272,13 @@ async def serve_sw():
 @app.get("/manifest.json")
 async def serve_manifest():
     return FileResponse(os.path.join(STATIC_DIR, "manifest.json"))
+@app.get("/icon.svg")
+async def serve_icon():
+    svg_code = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#051329"/>
+  <text x="50%" y="50%" font-family="monospace" font-size="300" font-weight="bold" fill="#00E5FF" text-anchor="middle" dominant-baseline="central">L</text>
+</svg>"""
+    return Response(content=svg_code, media_type="image/svg+xml")
 @app.post("/api/ai/draft_outline", response_model=OutlineResponse)
 async def draft_outline(data: DraftOutlineRequest):
     user_prompt = f"""Draft a {data.slide_count}-slide lecture outline on the topic: '{data.topic}'.
