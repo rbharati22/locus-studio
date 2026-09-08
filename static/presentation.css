@@ -316,3 +316,25 @@ body, html {
     right: 20px;
     bottom: auto; /* Overrides the bottom placement from the base class */
 }
+
+/* Media Left / Theory Right: Swaps the panels instantly using Flexbox */
+.slide-container.layout-split_right_theory {
+    flex-direction: row-reverse !important;
+}
+
+/* Full Width Theory: Completely hides the media drawer and widgets */
+.slide-container.layout-full_theory .media-preview-panel,
+.slide-container.layout-full_theory .media-strip,
+.slide-container.layout-full_theory .drawer-toggle-btn {
+    display: none !important;
+}
+
+/* Full Width Media: Hides the text panel so the media controls the whole screen */
+.slide-container.layout-full_media .slide-panel {
+    display: none !important;
+}
+.slide-container.layout-full_media .media-preview-panel {
+    width: 100% !important;
+    min-width: 100% !important;
+    position: relative !important;
+}

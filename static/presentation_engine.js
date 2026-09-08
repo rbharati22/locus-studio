@@ -201,7 +201,7 @@ function renderSlide() {
                     window.cachedUiState = 2; 
                     
                     let targetPreviewWidth;
-                    if (slide.layout === 'overlay_glass') {
+                    if ((slide.layout === 'overlay_glass' || slide.layout === 'full_media')) {
                         targetPreviewWidth = container.getBoundingClientRect().width;
                         previewPanel.style.position = 'absolute';
                         previewPanel.style.top = '0';
@@ -219,7 +219,7 @@ function renderSlide() {
                     previewPanel.style.width = `${targetPreviewWidth}px`;
                     previewPanel.style.minWidth = `${targetPreviewWidth}px`; 
                     toggleBtn.innerHTML = "▶";
-                    toggleBtn.style.right = slide.layout === 'overlay_glass' ? '0px' : `${targetPreviewWidth + 50}px`;
+                    toggleBtn.style.right = (slide.layout === 'overlay_glass' || slide.layout === 'full_media') ? '0px' : `${targetPreviewWidth + 50}px`;
                 } else {
                     window.cachedUiState = 0; 
                     mediaStrip.classList.remove('open');
@@ -286,7 +286,7 @@ function renderSlide() {
         // Ensure the media panel transitions smoothly if the AI changes layouts between slides
         if (window.cachedUiState === 2 && window.cachedMediaPanel) {
             let targetPreviewWidth;
-            if (slide.layout === 'overlay_glass') {
+            if ((slide.layout === 'overlay_glass' || slide.layout === 'full_media')) {
                 targetPreviewWidth = container.getBoundingClientRect().width;
                 window.cachedMediaPanel.style.position = 'absolute';
                 window.cachedMediaPanel.style.top = '0';
@@ -304,7 +304,7 @@ function renderSlide() {
             }
             window.cachedMediaPanel.style.width = `${targetPreviewWidth}px`;
             window.cachedMediaPanel.style.minWidth = `${targetPreviewWidth}px`; 
-            window.cachedToggleBtn.style.right = slide.layout === 'overlay_glass' ? '0px' : `${targetPreviewWidth + 50}px`;
+            window.cachedToggleBtn.style.right = (slide.layout === 'overlay_glass' || slide.layout === 'full_media') ? '0px' : `${targetPreviewWidth + 50}px`;
         }
 
         if (targetSyncTime !== null && window.cachedUiState === 2) {
