@@ -1,8 +1,8 @@
 {
   "name": "LOCUS Studio",
   "short_name": "LOCUS",
-  "id": "/present",
-  "start_url": "/present",
+  "id": "/",
+  "start_url": "/",
   "display": "fullscreen",
   "background_color": "#051329",
   "theme_color": "#00E5FF",
