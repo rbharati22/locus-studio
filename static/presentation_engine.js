@@ -440,34 +440,38 @@ function loadMediaPreview(media, container, initialSyncTime = null) {
         if (media.media_type !== "graph_2d") {
             let startY = 0;
             let startTime = 0;
+            let isSwiping = false;
 
-            // 1. Galaxy Tab S8: Touch Swipe Down
-            container.addEventListener('touchstart', (e) => {
-                startY = e.touches[0].clientY;
-                startTime = Date.now();
-            }, { passive: true });
-
-            container.addEventListener('touchend', (e) => {
-                let deltaY = e.changedTouches[0].clientY - startY;
-                if (deltaY > 40 && (Date.now() - startTime) < 400) {
-                    container.classList.toggle('theater-mode');
-                }
-            }, { passive: true });
-
-            // 2. Laptop: Mouse Click-and-Drag Down
-            container.addEventListener('mousedown', (e) => {
+            // Unifies Touch, Mouse, and S-Pen interactions
+            container.addEventListener('pointerdown', (e) => {
+                // Prevent theater mode from triggering if you are just grabbing the vertical resizer bar
+                if (e.target.closest('.drawer-resizer')) return; 
+                
+                isSwiping = true;
                 startY = e.clientY;
                 startTime = Date.now();
+                
+                // Crucial: Forces the tablet to track the swipe even if it crosses over an interactive widget/iframe
+                try { container.setPointerCapture(e.pointerId); } catch(err) {}
             });
 
-            container.addEventListener('mouseup', (e) => {
+            container.addEventListener('pointerup', (e) => {
+                if (!isSwiping) return;
+                isSwiping = false;
+                
+                try { container.releasePointerCapture(e.pointerId); } catch(err) {}
+
                 let deltaY = e.clientY - startY;
-                if (deltaY > 40 && (Date.now() - startTime) < 400) {
+                let deltaTime = Date.now() - startTime;
+                
+                // The Rule: Must slide down more than 40px in less than 400 milliseconds. 
+                // This guarantees a quick swipe and completely ignores tap-and-holds.
+                if (deltaY > 40 && deltaTime < 400) {
                     container.classList.toggle('theater-mode');
                 }
             });
 
-            // 3. Laptop: Standard Double-Click (Desktop fallback)
+            // Laptop: Standard Double-Click (Desktop fallback)
             container.addEventListener('dblclick', () => {
                 container.classList.toggle('theater-mode');
             });
