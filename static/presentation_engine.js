@@ -438,15 +438,39 @@ function loadMediaPreview(media, container, initialSyncTime = null) {
         container.appendChild(el);
 
         if (media.media_type !== "graph_2d") {
-            const fsBtn = document.createElement('button');
-            fsBtn.className = "media-fs-btn";
-            fsBtn.innerHTML = "⛶";
-            fsBtn.title = "Toggle Expanded Media";
-            fsBtn.onclick = (e) => {
-                e.stopPropagation();
+            let startY = 0;
+            let startTime = 0;
+
+            // 1. Galaxy Tab S8: Touch Swipe Down
+            container.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                startTime = Date.now();
+            }, { passive: true });
+
+            container.addEventListener('touchend', (e) => {
+                let deltaY = e.changedTouches[0].clientY - startY;
+                if (deltaY > 40 && (Date.now() - startTime) < 400) {
+                    container.classList.toggle('theater-mode');
+                }
+            }, { passive: true });
+
+            // 2. Laptop: Mouse Click-and-Drag Down
+            container.addEventListener('mousedown', (e) => {
+                startY = e.clientY;
+                startTime = Date.now();
+            });
+
+            container.addEventListener('mouseup', (e) => {
+                let deltaY = e.clientY - startY;
+                if (deltaY > 40 && (Date.now() - startTime) < 400) {
+                    container.classList.toggle('theater-mode');
+                }
+            });
+
+            // 3. Laptop: Standard Double-Click (Desktop fallback)
+            container.addEventListener('dblclick', () => {
                 container.classList.toggle('theater-mode');
-            };
-            container.appendChild(fsBtn);
+            });
         }
     }
 }
