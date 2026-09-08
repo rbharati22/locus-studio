@@ -451,13 +451,13 @@ function loadMediaPreview(media, container, initialSyncTime = null) {
             swipeZone.style.justifyContent = "center";
             
             // 2. Add a subtle Android-style pill indicator so you know exactly where to flick
-            const pill = document.createElement('div');
-            pill.style.width = "40px";
-            pill.style.height = "5px";
-            pill.style.backgroundColor = "rgba(0, 229, 255, 0.3)";
-            pill.style.borderRadius = "3px";
-            pill.style.marginTop = "12px";
-            swipeZone.appendChild(pill);
+            //const pill = document.createElement('div');
+            //pill.style.width = "40px";
+            //pill.style.height = "5px";
+            //pill.style.backgroundColor = "rgba(0, 229, 255, 0.3)";
+            //pill.style.borderRadius = "3px";
+            //pill.style.marginTop = "12px";
+            //swipeZone.appendChild(pill);
             container.appendChild(swipeZone);
 
             let startY = 0;
