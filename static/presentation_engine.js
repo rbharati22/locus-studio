@@ -441,12 +441,10 @@ function loadMediaPreview(media, container, initialSyncTime = null) {
             const fsBtn = document.createElement('button');
             fsBtn.className = "media-fs-btn";
             fsBtn.innerHTML = "⛶";
-            fsBtn.title = "Fullscreen Media";
+            fsBtn.title = "Toggle Expanded Media";
             fsBtn.onclick = (e) => {
                 e.stopPropagation();
-                if (el.requestFullscreen) el.requestFullscreen();
-                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-                else if (el.msRequestFullscreen) el.msRequestFullscreen();
+                container.classList.toggle('theater-mode');
             };
             container.appendChild(fsBtn);
         }
