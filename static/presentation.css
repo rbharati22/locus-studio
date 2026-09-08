@@ -343,3 +343,23 @@ body, html {
     left: auto !important;
     right: 0 !important;
 }
+
+/* ---------------------------------------------------
+   FLIP VISUAL HIGHLIGHTS FOR "MEDIA LEFT" LAYOUT
+--------------------------------------------------- */
+
+/* 1. Move the glowing border and shadow to the right seam */
+.slide-container.layout-split_right_theory .media-preview-panel {
+    border-left: none !important;
+    border-right: 1px solid rgba(0, 229, 255, 0.4) !important; /* Cinematic Cyan */
+    box-shadow: 5px 0 20px rgba(0, 229, 255, 0.1) !important; /* Casts shadow to the right over the text */
+    border-radius: 0 12px 12px 0 !important; /* Rounds the inner corners */
+}
+
+/* 2. Ensure the static 'closed' strip indicator moves to the left edge of the screen */
+.slide-container.layout-split_right_theory .media-strip {
+    right: auto !important;
+    left: 0 !important;
+    border-left: none !important;
+    border-right: 2px solid rgba(0, 229, 255, 0.6) !important;
+}

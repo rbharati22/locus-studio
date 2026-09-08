@@ -213,6 +213,47 @@ function renderSlide() {
             toggleBtn.onclick = (e) => {
                 e.stopPropagation(); 
                 
+                // --- FULL WIDTH MEDIA INTERCEPT ---
+                if (slide.layout === 'full_media') {
+                    // 1. Lock current 100% width in pixels so the transition has a starting point
+                    let startWidth = previewPanel.getBoundingClientRect().width;
+                    previewPanel.style.width = `${startWidth}px`;
+                    previewPanel.style.minWidth = `${startWidth}px`;
+                    
+                    // 2. Change layout to Media Left / Theory Right
+                    slide.layout = 'split_right_theory';
+                    container.className = 'slide-container layout-split_right_theory';
+                    
+                    // 3. FORCE BROWSER REFLOW: This tells the CSS engine to register the new class and starting pixels
+                    void previewPanel.offsetWidth;
+                    
+                    // 4. Calculate the target split width
+                    let splitRatio = parseFloat(slide.partition);
+                    if (isNaN(splitRatio) || splitRatio >= 0.9) splitRatio = 0.5; 
+                    let targetPreviewWidth = (container.getBoundingClientRect().width - 100) * (1 - splitRatio);
+                    
+                    // 5. Update the CSS styles for relative flexbox positioning
+                    previewPanel.style.position = 'relative';
+                    previewPanel.style.height = 'calc(100% - 4cm)';
+                    previewPanel.style.margin = '2cm 0';
+                    
+                    // 6. ANIMATE: Execute the shrink animation on the very next browser frame
+                    requestAnimationFrame(() => {
+                        previewPanel.style.width = `${targetPreviewWidth}px`;
+                        previewPanel.style.minWidth = `${targetPreviewWidth}px`; 
+                        
+                        // Snap button to the inner seam and update icon
+                        toggleBtn.innerHTML = "◀";
+                        toggleBtn.style.left = `${targetPreviewWidth + 50}px`;
+                        toggleBtn.style.right = "auto";
+                    });
+                    
+                    // 7. Sync the JS memory state to 'open' so subsequent clicks collapse it naturally
+                    window.cachedUiState = 2;
+                    
+                    return; // Stop standard toggle execution
+                }
+
                 if (window.cachedUiState === 0) {
                     window.cachedUiState = 2; 
                     
