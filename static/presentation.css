@@ -338,3 +338,8 @@ body, html {
     min-width: 100% !important;
     position: relative !important;
 }
+/* Moves the drag resizer to the inner edge when Media is on the Left */
+.slide-container.layout-split_right_theory .drawer-resizer {
+    left: auto !important;
+    right: 0 !important;
+}

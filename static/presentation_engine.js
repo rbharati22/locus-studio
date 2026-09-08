@@ -124,6 +124,12 @@ function renderSlide() {
                 try { return katex.renderToString(math, { throwOnError: false }); } 
                 catch (e) { return match; }
             });
+            
+            // Add Markdown Support for the AI's text fragments
+            formattedText = formattedText.replace(/\*\*([^\*]+)\*\*/g, '<strong style="color: #00E5FF;">$1</strong>'); // Bold (Cyan accent)
+            formattedText = formattedText.replace(/\*([^\*]+)\*/g, '<em>$1</em>'); // Italics
+            formattedText = formattedText.replace(/\n/g, '<br>'); // Preserve newlines
+            
             el.innerHTML = formattedText; 
         }
 
@@ -180,7 +186,17 @@ function renderSlide() {
             
             const toggleBtn = document.createElement('button');
             toggleBtn.className = "drawer-toggle-btn";
-            toggleBtn.innerHTML = "◀";
+            
+            // Initial closed state based on layout side
+            if (slide.layout === 'split_right_theory') {
+                toggleBtn.innerHTML = "▶";
+                toggleBtn.style.left = "0";
+                toggleBtn.style.right = "auto";
+            } else {
+                toggleBtn.innerHTML = "◀";
+                toggleBtn.style.right = "0";
+                toggleBtn.style.left = "auto";
+            }
             
             const mediaStrip = document.createElement('div');
             mediaStrip.className = "media-strip";
@@ -218,16 +234,34 @@ function renderSlide() {
                     previewPanel.classList.add('open');
                     previewPanel.style.width = `${targetPreviewWidth}px`;
                     previewPanel.style.minWidth = `${targetPreviewWidth}px`; 
-                    toggleBtn.innerHTML = "▶";
-                    toggleBtn.style.right = (slide.layout === 'overlay_glass' || slide.layout === 'full_media') ? '0px' : `${targetPreviewWidth + 50}px`;
+                    
+                    // Attach button to the correct active edge
+                    if (slide.layout === 'split_right_theory') {
+                        toggleBtn.innerHTML = "◀";
+                        toggleBtn.style.left = `${targetPreviewWidth + 50}px`;
+                        toggleBtn.style.right = "auto";
+                    } else {
+                        toggleBtn.innerHTML = "▶";
+                        toggleBtn.style.right = (slide.layout === 'overlay_glass' || slide.layout === 'full_media') ? '0px' : `${targetPreviewWidth + 50}px`;
+                        toggleBtn.style.left = "auto";
+                    }
                 } else {
                     window.cachedUiState = 0; 
                     mediaStrip.classList.remove('open');
                     previewPanel.classList.remove('open');
                     previewPanel.style.width = "0px";
                     previewPanel.style.minWidth = "0px";
-                    toggleBtn.innerHTML = "◀";
-                    toggleBtn.style.right = "0";
+                    
+                    // Revert button to closed edge
+                    if (slide.layout === 'split_right_theory') {
+                        toggleBtn.innerHTML = "▶";
+                        toggleBtn.style.left = "0";
+                        toggleBtn.style.right = "auto";
+                    } else {
+                        toggleBtn.innerHTML = "◀";
+                        toggleBtn.style.right = "0";
+                        toggleBtn.style.left = "auto";
+                    }
                     
                     const activeMedia = previewPanel.querySelector('.media-embed');
                     if (activeMedia) {
@@ -262,15 +296,33 @@ function renderSlide() {
             document.addEventListener('pointermove', (e) => {
                 const activePanel = document.querySelector('.media-preview-panel.open');
                 if (!window.__isResizing || !activePanel) return;
+                
                 const containerRect = document.getElementById('slideContainer').getBoundingClientRect();
-                let newWidth = containerRect.right - e.clientX - 50;
+                const currentLayout = currentDeck.slides[currentSlideIndex].layout;
+                let newWidth;
+                
+                // Calculate drag distance from the correct side of the screen
+                if (currentLayout === 'split_right_theory') {
+                    newWidth = e.clientX - containerRect.left - 50;
+                } else {
+                    newWidth = containerRect.right - e.clientX - 50;
+                }
                 
                 if (newWidth < 300) newWidth = 300;
                 if (newWidth > containerRect.width * 0.8) newWidth = containerRect.width * 0.8;
                 
                 activePanel.style.width = `${newWidth}px`;
                 activePanel.style.minWidth = `${newWidth}px`; 
-                document.querySelector('.drawer-toggle-btn').style.right = `${newWidth + 50}px`;
+                
+                // Keep button attached to the active dragging edge
+                const toggleBtn = document.querySelector('.drawer-toggle-btn');
+                if (currentLayout === 'split_right_theory') {
+                    toggleBtn.style.left = `${newWidth + 50}px`;
+                    toggleBtn.style.right = "auto";
+                } else {
+                    toggleBtn.style.right = `${newWidth + 50}px`;
+                    toggleBtn.style.left = "auto";
+                }
             });
 
             document.addEventListener('pointerup', () => {
@@ -283,7 +335,7 @@ function renderSlide() {
             });
         }
 
-        // Ensure the media panel transitions smoothly if the AI changes layouts between slides
+        // Layout Persistence (When AI swaps layouts between slides)
         if (window.cachedUiState === 2 && window.cachedMediaPanel) {
             let targetPreviewWidth;
             if ((slide.layout === 'overlay_glass' || slide.layout === 'full_media')) {
@@ -304,7 +356,17 @@ function renderSlide() {
             }
             window.cachedMediaPanel.style.width = `${targetPreviewWidth}px`;
             window.cachedMediaPanel.style.minWidth = `${targetPreviewWidth}px`; 
-            window.cachedToggleBtn.style.right = (slide.layout === 'overlay_glass' || slide.layout === 'full_media') ? '0px' : `${targetPreviewWidth + 50}px`;
+            
+            // Maintain button position across slides
+            if (slide.layout === 'split_right_theory') {
+                window.cachedToggleBtn.innerHTML = "◀";
+                window.cachedToggleBtn.style.left = `${targetPreviewWidth + 50}px`;
+                window.cachedToggleBtn.style.right = "auto";
+            } else {
+                window.cachedToggleBtn.innerHTML = "▶";
+                window.cachedToggleBtn.style.right = (slide.layout === 'overlay_glass' || slide.layout === 'full_media') ? '0px' : `${targetPreviewWidth + 50}px`;
+                window.cachedToggleBtn.style.left = "auto";
+            }
         }
 
         if (targetSyncTime !== null && window.cachedUiState === 2) {
