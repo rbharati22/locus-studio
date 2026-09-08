@@ -230,9 +230,7 @@ body, html {
     transition: opacity 0.2s ease;
 }
 
-.presenter-controls:active {
-    opacity: 0.8;
-}
+
 
 .presenter-controls button {
     background: var(--bg-dark, #051329);
@@ -288,9 +286,9 @@ body, html {
     position: relative; 
 }
 
-/* Smooth right-to-left entry animation */
+/* Smooth right-to-left entry animation using percentages */
 @keyframes slideInFromRight {
-    0% { transform: translateX(100vw); }
+    0% { transform: translateX(100%); }
     100% { transform: translateX(0); }
 }
 
@@ -298,8 +296,12 @@ body, html {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important; /* Eliminates the gap under the header */
+    box-sizing: border-box !important;
     z-index: 9999 !important;
     background-color: var(--bg-dark, #051329) !important;
     display: flex;
