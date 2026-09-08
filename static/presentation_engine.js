@@ -438,41 +438,56 @@ function loadMediaPreview(media, container, initialSyncTime = null) {
         container.appendChild(el);
 
         if (media.media_type !== "graph_2d") {
+            // 1. Create a transparent Swipe Shield at the top edge
+            const swipeZone = document.createElement('div');
+            swipeZone.style.position = "absolute";
+            swipeZone.style.top = "0";
+            swipeZone.style.left = "0";
+            swipeZone.style.width = "100%";
+            swipeZone.style.height = "60px"; // Top 60 pixels of the panel
+            swipeZone.style.zIndex = "1000";
+            swipeZone.style.touchAction = "none"; // CRITICAL: Stops the browser from hijacking the swipe for scrolling
+            swipeZone.style.display = "flex";
+            swipeZone.style.justifyContent = "center";
+            
+            // 2. Add a subtle Android-style pill indicator so you know exactly where to flick
+            const pill = document.createElement('div');
+            pill.style.width = "40px";
+            pill.style.height = "5px";
+            pill.style.backgroundColor = "rgba(0, 229, 255, 0.3)";
+            pill.style.borderRadius = "3px";
+            pill.style.marginTop = "12px";
+            swipeZone.appendChild(pill);
+            container.appendChild(swipeZone);
+
             let startY = 0;
             let startTime = 0;
             let isSwiping = false;
 
-            // Unifies Touch, Mouse, and S-Pen interactions
-            container.addEventListener('pointerdown', (e) => {
-                // Prevent theater mode from triggering if you are just grabbing the vertical resizer bar
-                if (e.target.closest('.drawer-resizer')) return; 
-                
+            // 3. Attach gesture strictly to the top shield so the iframe cannot swallow it
+            swipeZone.addEventListener('pointerdown', (e) => {
                 isSwiping = true;
                 startY = e.clientY;
                 startTime = Date.now();
-                
-                // Crucial: Forces the tablet to track the swipe even if it crosses over an interactive widget/iframe
-                try { container.setPointerCapture(e.pointerId); } catch(err) {}
+                try { swipeZone.setPointerCapture(e.pointerId); } catch(err) {}
             });
 
-            container.addEventListener('pointerup', (e) => {
+            swipeZone.addEventListener('pointerup', (e) => {
                 if (!isSwiping) return;
                 isSwiping = false;
-                
-                try { container.releasePointerCapture(e.pointerId); } catch(err) {}
+                try { swipeZone.releasePointerCapture(e.pointerId); } catch(err) {}
 
                 let deltaY = e.clientY - startY;
                 let deltaTime = Date.now() - startTime;
                 
-                // The Rule: Must slide down more than 40px in less than 400 milliseconds. 
-                // This guarantees a quick swipe and completely ignores tap-and-holds.
+                // The Rule: Tap and immediately flick down (more than 40px in under 400ms)
                 if (deltaY > 40 && deltaTime < 400) {
                     container.classList.toggle('theater-mode');
                 }
             });
 
-            // Laptop: Standard Double-Click (Desktop fallback)
-            container.addEventListener('dblclick', () => {
+            // Laptop fallback: double-click the top handle
+            swipeZone.addEventListener('dblclick', () => {
                 container.classList.toggle('theater-mode');
             });
         }
