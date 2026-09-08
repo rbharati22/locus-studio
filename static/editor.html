@@ -375,10 +375,11 @@
 
         // --- 5. Bridge to Presenter ---
         function launchPresenter() {
-            if (deck.slides.length === 0) return alert("Your deck is empty. Add a slide first.");
-            localStorage.setItem('locusCurrentDeck', JSON.stringify(deck));
-            window.open('/present', '_blank');
-        }
+    if (deck.slides.length === 0) return alert("Your deck is empty. Add a slide first.");
+    localStorage.setItem('locusCurrentDeck', JSON.stringify(deck));
+    // Navigate in the same window instead of opening a popup
+    window.location.href = '/present';
+}
 
         function renderAiMedia(index) {
             // Send the raw script data to localStorage and open the Media Studio

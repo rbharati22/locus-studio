@@ -17,6 +17,7 @@ body, html {
     font-family: 'Segoe UI', system-ui, sans-serif;
     background-color: var(--bg-dark); color: var(--text-main);
     overflow: hidden;
+    overscroll-behavior: none;
     user-select: none; /* Disables text highlighting and the vertical text cursor */
     -webkit-user-select: none; /* Safari/iOS support */
     -webkit-tap-highlight-color: transparent; /* Removes the blue flash on touchscreens */
