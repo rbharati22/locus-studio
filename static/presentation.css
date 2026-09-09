@@ -104,7 +104,10 @@ body, html {
     overflow: hidden; 
 }
 .media-preview-panel.open {
-    border-left: 2px solid var(--border); /* Shows border only when open */
+    /* Mirrored Cinematic Cyan Glow for the Right-Side Media Panel */
+    border-left: 1px solid rgba(0, 229, 255, 0.4) !important;
+    box-shadow: -5px 0 20px rgba(0, 229, 255, 0.1) !important; /* Casts shadow to the left over the text */
+    border-radius: 12px 0 0 12px !important; /* Rounds the inner corners */
 }
 
 .media-fs-btn {
@@ -144,14 +147,21 @@ body, html {
 }
 .drawer-toggle-btn:hover { background: rgba(0, 229, 255, 0.3); color: white; }
 
+/* 2. Style the media-strip to act as the glowing vertical line */
 .media-strip {
-    position: absolute; right: 0; top: calc(3.0rem + 2cm + 20px);
-    width: var(--strip-width); height: auto; max-height: 80%;
-    background: rgba(2, 8, 19, 0.95); backdrop-filter: blur(12px);
-    border: 1px solid var(--border); border-right: none; border-radius: 8px 0 0 8px;
-    padding: 8px; z-index: 1004; display: flex; flex-direction: column; gap: 5px;
-    transform: translateX(100%); opacity: 0; pointer-events: none;
-    transition: transform 0.4s ease, opacity 0.3s;
+    position: absolute !important;
+    top: 2cm !important;
+    height: calc(100% - 4cm) !important;
+    width: 3px !important; /* Slightly thicker for perfect visibility */
+    background-color: rgba(0, 229, 255, 0.6) !important; /* Cinematic Cyan */
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.8) !important; /* Edge glow effect */
+    z-index: 10 !important;
+    
+    /* THE FIX: Forcefully cancel the old off-screen translation and force it to stay visible! */
+    transform: none !important; 
+    opacity: 1 !important; 
+    
+    transition: opacity 0.4s ease !important;
 }
 .media-strip.open { transform: translateX(0); opacity: 1; pointer-events: auto; }
 
@@ -322,12 +332,7 @@ body, html {
     flex-direction: row-reverse !important;
 }
 
-/* Full Width Theory: Completely hides the media drawer and widgets */
-.slide-container.layout-full_theory .media-preview-panel,
-.slide-container.layout-full_theory .media-strip,
-.slide-container.layout-full_theory .drawer-toggle-btn {
-    display: none !important;
-}
+
 
 /* Full Width Media: Hides the text panel so the media controls the whole screen */
 .slide-container.layout-full_media .slide-panel {
@@ -348,59 +353,101 @@ body, html {
    FLIP VISUAL HIGHLIGHTS FOR "MEDIA LEFT" LAYOUT
 --------------------------------------------------- */
 
-/* 1. Move the glowing border and shadow to the right seam */
-.slide-container.layout-split_right_theory .media-preview-panel {
+/* 1. Move the glowing border and shadow to the right seam ONLY WHEN OPEN */
+.slide-container.layout-split_right_theory .media-preview-panel.open {
     border-left: none !important;
     border-right: 1px solid rgba(0, 229, 255, 0.4) !important; /* Cinematic Cyan */
     box-shadow: 5px 0 20px rgba(0, 229, 255, 0.1) !important; /* Casts shadow to the right over the text */
     border-radius: 0 12px 12px 0 !important; /* Rounds the inner corners */
 }
 
-/* 2. Ensure the static 'closed' strip indicator moves to the left edge of the screen */
-.slide-container.layout-split_right_theory .media-strip {
-    right: auto !important;
-    left: 0 !important;
-    border-left: none !important;
-    border-right: 2px solid rgba(0, 229, 255, 0.6) !important;
-}
+
 /* Hide the closed-state media strip indicator when the drawer is open */
 .media-strip.open {
     display: none !important;
 }
 /* ---------------------------------------------------
-   SLEEK EDGE SWIPE LINE (REPLACES BUTTON)
+   UNIFIED EDGE SWIPE LINE (THE FINAL FIX)
 --------------------------------------------------- */
-
-/* 1. Completely destroy the old button if any old cached versions try to load it */
 .drawer-toggle-btn {
     display: none !important;
 }
 
-/* 2. Style the media-strip to act as the glowing vertical line */
+/* Force the strip to be exactly ONE line and purge all legacy drawer styles */
 .media-strip {
-    position: absolute !important;
-    top: 2cm !important;
-    height: calc(100% - 4cm) !important;
-    width: 2px !important;
-    background-color: rgba(0, 229, 255, 0.6) !important; /* Cinematic Cyan */
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.8) !important; /* Edge glow effect */
-    z-index: 10 !important;
-    transition: opacity 0.4s ease !important;
+    position: fixed !important; 
+    top: calc(3.0rem + 2cm + 20px) !important; 
+    height: calc(100% - 4cm - 3.0rem - 40px) !important;
+    width: 3px !important;
+    min-width: 3px !important; 
+    padding: 0 !important; 
+    margin: 0 !important;
+    
+    /* 🚨 THE CRITICAL OVERRIDES TO KILL THE ASYMMETRICAL GHOSTS 🚨 */
+    border-radius: 0px !important; 
+    backdrop-filter: none !important; 
+    border: none !important; 
+    
+    background-color: rgba(0, 229, 255, 0.8) !important; 
+    z-index: 9999 !important;
+    transform: none !important; 
+    opacity: 1 !important; 
+    pointer-events: none !important; 
 }
 
-/* 3. Lock line to the correct edge based on the active layout */
-.slide-container.layout-split_left_theory .media-strip {
-    right: 0px !important;
-    left: auto !important;
-}
-
+/* Lock to the left edge and cast glow INWARD (to the right) */
 .slide-container.layout-split_right_theory .media-strip {
     left: 0px !important;
     right: auto !important;
+    box-shadow: 6px 0 16px rgba(0, 229, 255, 0.9) !important;
 }
 
-/* 4. Smoothly fade the line out when the panel opens */
+/* Lock to the right edge and cast glow INWARD (to the left) */
+.slide-container.layout-split_left_theory .media-strip,
+.slide-container.layout-full_media .media-strip,
+.slide-container.layout-overlay_glass .media-strip,
+.slide-container.layout-full_theory .media-strip { /* <--- THIS ACTIVATES IT FOR FULL THEORY */
+    right: 0px !important; /* Snapped perfectly to 0px to match the left edge */
+    left: auto !important;
+    box-shadow: -6px 0 16px rgba(0, 229, 255, 0.9) !important;
+}
+
+/* Hide when panel is open */
 .media-strip.open {
-    opacity: 0 !important;
-    pointer-events: none !important;
+    display: none !important;
+}
+/* ---------------------------------------------------
+   THE GHOST MENU FIX (Uncovers the left glowing line)
+--------------------------------------------------- */
+/* Strip the massive shadow and border from the closed menu so it stops bleeding onto the screen! */
+.slide-nav-drawer {
+    box-shadow: none !important;
+    border-right: 1px solid transparent !important; /* Uses transparent to prevent 1px UI jumping */
+}
+
+/* Restore the shadow and border ONLY when you actually open the Table of Contents */
+.slide-nav-drawer.open {
+    box-shadow: 10px 0 30px rgba(0,0,0,0.7) !important;
+    border-right: 1px solid var(--border) !important;
+}
+/* ---------------------------------------------------
+   MIRROR PHYSICS: FIXING LEFT PANEL ASYMMETRY
+--------------------------------------------------- */
+
+/* 1. ANIMATION PHYSICS: Anchor the widget to the moving edge so it SLIDES instead of WIPES */
+.slide-container.layout-split_right_theory .media-embed {
+    left: auto !important;
+    right: 0 !important; 
+}
+
+/* 2. DRAG HITBOX: Center the grab handle perfectly over the glowing seam */
+.slide-container.layout-split_right_theory .drawer-resizer {
+    left: auto !important;
+    right: -6px !important; /* Matches the -6px offset of the right side */
+}
+
+/* 3. SYMMETRY: Mirror the Full-Screen button to the bottom-left outer corner */
+.slide-container.layout-split_right_theory .media-fs-btn {
+    right: auto !important;
+    left: 15px !important;
 }

@@ -252,38 +252,28 @@ function renderSlide() {
             });
         }
 
-        // --- Position the Swipe Zone & Visual Line based on Layout ---
+        // --- Position the Swipe Zone based on Layout ---
         
-        // 1. Purge messy styles to let your beautiful CSS define the exact look
+        // 1. Purge all my messy JS styles! Let your CSS handle the visual line natively.
         window.cachedMediaStrip.removeAttribute('style');
         window.cachedSideSwipeZone.removeAttribute('style');
 
-        // 2. Restore basic invisible swipe zone dimensions
+        // 2. Position ONLY the invisible swipe zone for your gestures
+        window.cachedSideSwipeZone.style.position = "absolute";
         window.cachedSideSwipeZone.style.top = "0";
         window.cachedSideSwipeZone.style.width = "50px";
         window.cachedSideSwipeZone.style.height = "100%";
         window.cachedSideSwipeZone.style.zIndex = "1000";
         window.cachedSideSwipeZone.style.touchAction = "none";
 
-        // 3. Smart Anchor Positioning (The Core Fix)
         if (currentLayout === 'split_right_theory') {
-            // Media Left: Use absolute positioning (anchors perfectly right next to your sidebar)
-            window.cachedSideSwipeZone.style.setProperty('position', 'absolute', 'important');
-            window.cachedSideSwipeZone.style.setProperty('left', '0px', 'important');
-            window.cachedSideSwipeZone.style.setProperty('right', 'auto', 'important');
-            
-            window.cachedMediaStrip.style.setProperty('position', 'absolute', 'important');
-            window.cachedMediaStrip.style.setProperty('left', '0px', 'important');
-            window.cachedMediaStrip.style.setProperty('right', 'auto', 'important');
+            // Media Left
+            window.cachedSideSwipeZone.style.left = "0px";
+            window.cachedSideSwipeZone.style.right = "auto";
         } else {
-            // Media Right: Use fixed positioning (anchors directly to the physical monitor edge, escaping container overflow!)
-            window.cachedSideSwipeZone.style.setProperty('position', 'fixed', 'important');
-            window.cachedSideSwipeZone.style.setProperty('right', '0px', 'important');
-            window.cachedSideSwipeZone.style.setProperty('left', 'auto', 'important');
-            
-            window.cachedMediaStrip.style.setProperty('position', 'fixed', 'important');
-            window.cachedMediaStrip.style.setProperty('right', '0px', 'important'); 
-            window.cachedMediaStrip.style.setProperty('left', 'auto', 'important');
+            // Media Right
+            window.cachedSideSwipeZone.style.right = "0px";
+            window.cachedSideSwipeZone.style.left = "auto";
         }
 
         // --- 2. Calculate Dimensions ---
@@ -298,9 +288,34 @@ function renderSlide() {
             targetPreviewWidth = containerWidth;
         }
 
+        // --- 2.5 FIX WIDGET JITTER AND ALIGNMENT (The Curtain Reveal) ---
+        // Lock the iframe to the final target width so it renders perfectly once, avoiding the 0px squish!
+        const embedEl = window.cachedMediaPanel.querySelector('.media-embed');
+        if (embedEl) {
+            embedEl.style.width = `${targetPreviewWidth}px`;
+            
+            // Anchor it to the physical edge so it stays perfectly still during the slide animation
+            if (currentLayout === 'split_right_theory') {
+                embedEl.style.left = '0px';
+                embedEl.style.right = 'auto';
+            } else {
+                embedEl.style.right = '0px';
+                embedEl.style.left = 'auto';
+            }
+        }
+
         // Helper to instantly snap UI to Open or Closed state flawlessly
         function snapPanelState(isOpen) {
             window.cachedMediaPanel.style.transition = 'none';
+            const embed = window.cachedMediaPanel.querySelector('.media-embed');
+
+            // 🧹 CLEAN UP: Remove all the bad pixel-stretching styles!
+            if (embed) {
+                embed.style.width = '';
+                embed.style.left = '';
+                embed.style.right = '';
+                embed.style.minWidth = ''; 
+            }
 
             if (isOpen) {
                 window.cachedUiState = 2;
@@ -339,6 +354,15 @@ function renderSlide() {
 
         // --- 4. Dynamic Toggle Logic ---
         function togglePanelLayout() {
+            const embed = window.cachedMediaPanel.querySelector('.media-embed');
+            
+            // 🧹 CLEAN UP: Ensure no legacy stretching styles are attached
+            if (embed) {
+                embed.style.width = '';
+                embed.style.left = '';
+                embed.style.right = '';
+            }
+
             // Full Width Media Intercept
             if (slide.layout === 'full_media') {
                 let startWidth = window.cachedMediaPanel.getBoundingClientRect().width;
@@ -360,10 +384,8 @@ function renderSlide() {
                     window.cachedMediaPanel.style.minWidth = `${newTargetWidth}px`; 
                 });
                 
-                // Keep swipe zone attached to edge
                 window.cachedSideSwipeZone.style.left = "0";
                 window.cachedSideSwipeZone.style.right = "auto";
-                
                 window.cachedUiState = 2;
                 return; 
             }
@@ -376,11 +398,7 @@ function renderSlide() {
                 
                 if (currentLayout === 'overlay_glass' || currentLayout === 'full_media') {
                     window.cachedMediaPanel.style.position = 'absolute';
-                    window.cachedMediaPanel.style.top = '0';
-                    window.cachedMediaPanel.style.left = '0';
-                    window.cachedMediaPanel.style.height = '100%';
-                    window.cachedMediaPanel.style.margin = '0';
-                    window.cachedMediaPanel.style.zIndex = '1';
+                    // ... layout logic ...
                 } else {
                     window.cachedMediaPanel.style.position = 'relative';
                     window.cachedMediaPanel.style.height = 'calc(100% - 4cm)';
@@ -389,8 +407,23 @@ function renderSlide() {
                 
                 window.cachedMediaPanel.style.width = `${targetPreviewWidth}px`;
                 window.cachedMediaPanel.style.minWidth = `${targetPreviewWidth}px`; 
+                
+                // 🚪 SLIDING DOOR OPEN: Prevent widget from squeezing, then release it!
+                if (embed) {
+                    embed.style.minWidth = `${targetPreviewWidth}px`;
+                    setTimeout(() => {
+                        if (window.cachedUiState === 2) embed.style.minWidth = ''; 
+                    }, 750);
+                }
             } else {
                 window.cachedUiState = 0;
+                
+                // 🚪 SLIDING DOOR CLOSE: Lock the current size so it slides under smoothly!
+                if (embed) {
+                    const currentActualWidth = window.cachedMediaPanel.getBoundingClientRect().width;
+                    embed.style.minWidth = `${currentActualWidth}px`;
+                }
+                
                 window.cachedMediaPanel.classList.remove('open');
                 window.cachedMediaStrip.classList.remove('open');
                 window.cachedMediaPanel.style.width = "0px";
@@ -428,6 +461,7 @@ function renderSlide() {
                 
                 window.cachedMediaPanel.style.width = `${newWidth}px`;
                 window.cachedMediaPanel.style.minWidth = `${newWidth}px`; 
+                // ❌ Removed the bad embed override here so your canvases naturally redraw!
             });
 
             document.addEventListener('pointerup', () => {
@@ -435,6 +469,7 @@ function renderSlide() {
                     window.__isResizing = false;
                     document.body.style.cursor = 'default';
                     if (window.cachedMediaPanel) window.cachedMediaPanel.style.transition = '';
+                    // ❌ Removed the bad unlock override here.
                 }
             });
         }
