@@ -1,0 +1,681 @@
+{
+  "project_title": "Secure OTP Generation & Probability Spaces",
+  "subject": "Applied Mathematics for Computer Science",
+  "author": "Prof. Rakesh Bharati",
+  "theme": "locus_cinematic",
+  "slides": [
+    {
+      "id": "slide_01",
+      "title": "Real-World Hook: Secure Authentication",
+      "subtitle": "Failure Modes in Cryptographic Generation",
+      "layout": "full_media",
+      "partition": 0.5,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "In computational systems, poorly designed Random Number Generators (RNGs) lead to catastrophic authentication failures. We evaluate a specific constraint-based generator as defined in image_f564a4.png.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "Problem reference: image_f564a4.png. A banking application generates a 5-digit One-Time Password (OTP) using the digits 0, 1, 2, 3, and 4 without repetition. The OTP cannot begin with 0. An OTP is accepted by the verification server only if it is divisible by 4. If an OTP is generated randomly, find the probability that it is accepted.",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "We must map this computational constraint to a rigorous probability space $(\\Omega, \\mathcal{F}, P)$.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "otp_hook.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_02",
+      "title": "Mathematical Foundation: The Sample Space",
+      "subtitle": "Defining the Domain & Constraints",
+      "layout": "split_right_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Let the available set of digits be $S_D = \\{0, 1, 2, 3, 4\\}$. We construct a 5-digit vector $\\vec{D} = [D_1, D_2, D_3, D_4, D_5]$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Constraint 1: Elements are distinct (No repetition).",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Constraint 2: Leading digit condition $D_1 \\neq 0$.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\Omega = \\{ \\vec{D} \\mid D_i \\in S_D, D_i \\neq D_j \\text{ for } i \\neq j, D_1 \\neq 0 \\}",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "sample_space_init.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_03",
+      "title": "Calculating the Total Sample Space $n(S)$",
+      "subtitle": "Fundamental Principle of Counting",
+      "layout": "split_right_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "We compute the cardinality of our total sample space $n(S)$ by determining the permutations for each valid position.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Choices for } D_1 = 4 \\quad (\\text{Excluding } 0)",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Choices for } D_2, D_3, D_4, D_5 = P(4, 4) = 4!",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "n(S) = 4 \\times 24 = 96",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "sample_space_init.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_04",
+      "title": "Defining the Favorable Event Space $E$",
+      "subtitle": "Divisibility by 4 & Suffix Extraction",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "A number in base 10 is divisible by $4$ if and only if the integer formed by its last two digits is divisible by $4$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "E = \\{ \\vec{D} \\in \\Omega \\mid D_4 D_5 \\equiv 0 \\pmod 4 \\}",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "Extracting all valid 2-digit suffixes from $S_D$ without repetition yields our foundational suffix set.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "S_{\\text{suffix}} = \\{04, 12, 20, 24, 32, 40\\}",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "divisibility_suffix.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_05",
+      "title": "Event Partitioning: Case Analysis",
+      "subtitle": "Group A: Suffixes containing the digit '0'",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "To correctly apply the $D_1 \\neq 0$ constraint, we partition $S_{\\text{suffix}}$ into two disjoint sets. First, suffixes containing $0$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "A = \\{04, 20, 40\\}",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "Since $0$ is already consumed in the suffix, $D_1$ can be any of the remaining $3$ digits. The permutations for $D_1, D_2, D_3$ are strictly $3!$.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "n(E_A) = |A| \\times 3! = 3 \\times 6 = 18",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "partition_group_a.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_06",
+      "title": "Event Partitioning: Case Analysis",
+      "subtitle": "Group B: Suffixes without the digit '0'",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Next, we analyze the disjoint subset of suffixes that do not utilize the digit $0$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "B = \\{12, 24, 32\\}",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "Here, $0$ is available but cannot be placed at $D_1$. Thus, $D_1$ has only $2$ valid choices. The remaining two slots have $2!$ choices.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "n(E_B) = |B| \\times (2 \\times 2!) = 3 \\times 4 = 12",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "partition_group_b.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_07",
+      "title": "Aggregating the Probability Space",
+      "subtitle": "Final Event Space Cardinality",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "Since groups A and B are mutually exclusive partitions of our favorable event space, we apply the Rule of Sum.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "n(E) = n(E_A) + n(E_B)",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "n(E) = 18 + 12 = 30",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "P(E) = \\frac{n(E)}{n(S)} = \\frac{30}{96} = \\frac{5}{16}",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "probability_aggregator.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_08",
+      "title": "Interactive Simulation: Suffix Modulo Mapping",
+      "subtitle": "Visualizing Modular Arithmetic on OTPs",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "By plotting all $P(5,2) = 20$ suffix permutations, we can geometrically filter those that map to $0$ under modulo $4$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Step 1: Generate all ordered pairs $(D_4, D_5)$.",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Step 2: Apply the transformation $T(x,y) = (10x + y) \\pmod 4$.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Step 3: Isolate the kernel of the transformation.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "simulation_suffix.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_09",
+      "title": "Simulation: Combinatorial Case Branching",
+      "subtitle": "Visualizing Tree Architectures for $n(E_A)$",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "When we fix a suffix containing $0$ (e.g., $04$), the prefix tree branches uniformly.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Root} \\rightarrow (D_1: 3) \\rightarrow (D_2: 2) \\rightarrow (D_3: 1)",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "This perfect symmetry yields precisely $6$ leaves per root, maintaining linear independence across the subset.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "simulation_tree_a.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_10",
+      "title": "Simulation: Asymmetric Case Branching",
+      "subtitle": "Visualizing Tree Architectures for $n(E_B)$",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "When fixing a suffix without $0$ (e.g., $12$), the constraint $D_1 \\neq 0$ prunes one of the branches at the first layer.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Root} \\rightarrow (D_1: 2) \\rightarrow (D_2: 2) \\rightarrow (D_3: 1)",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "The tree depth is identical, but the node degree at level $1$ is artificially restricted, altering the combinatorial density.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "simulation_tree_b.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_11",
+      "title": "Algorithmic Implementation & Complexity",
+      "subtitle": "Translating Math to Code Validation",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "code",
+          "content": "def P_accepted():\n    S, E = 0, 0\n    for p in permutations('01234'):\n        if p[0] != '0':\n            S += 1\n            if int(''.join(p)) % 4 == 0:\n                E += 1\n    return E / S",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Analytical Derivation: $O(1)$ Time Complexity.",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Algorithmic Brute Force: $O(N!)$ Space & Time.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "Strict mathematical evaluation is computationally superior for cryptanalysis and defining bounds.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "complexity_analysis.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_12",
+      "title": "Summary & Analytical Takeaways",
+      "subtitle": "Consolidating OTP Probability Mechanics",
+      "layout": "full_theory",
+      "partition": 0.5,
+      "theory_fragments": [
+        {
+          "type": "bullet",
+          "content": "Total Sample Space constrained by leading zero: $n(S) = 96$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": true,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Divisibility by $4$ isolates specific 2-digit permutations at the OTP tail.",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Partitioning disjoint sets based on the digit '0' is required to prevent double-counting permutations.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "\\text{Final Server Acceptance Probability: } P = \\frac{5}{16}",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "probability_aggregator.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    }
+  ],
+  "media_scripts": [
+    {
+      "filename": "otp_hook.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Initialization', 'Generating Array', 'Constraint Applied', 'System Reject/Accept'][currentStep-1];\n  let telemetry = 'OTP Validation Engine Status: ' + (currentStep < 4 ? 'Awaiting...' : 'Evaluating Divisibility');\n  drawHUD('Cryptographic Server', stepDesc, telemetry);\n  ctx.fillStyle = '#1e293b'; ctx.fillRect(canvas.width/2 - 250, canvas.height/2 - 100, 500, 200);\n  ctx.strokeStyle = '#334155'; ctx.lineWidth = 4; ctx.strokeRect(canvas.width/2 - 250, canvas.height/2 - 100, 500, 200);\n  ctx.fillStyle = '#00E5FF'; ctx.font = '36px monospace'; ctx.textAlign = 'center';\n  if(currentStep === 1) ctx.fillText('SERVER AWAITING OTP', canvas.width/2, canvas.height/2);\n  if(currentStep === 2) ctx.fillText('[ 0 4 2 1 3 ]', canvas.width/2, canvas.height/2);\n  if(currentStep === 3) { ctx.fillStyle = '#f43f5e'; ctx.fillText('ERROR: D1=0', canvas.width/2, canvas.height/2 + 40); ctx.fillStyle = '#64748b'; ctx.fillText('[ 0 4 2 1 3 ]', canvas.width/2, canvas.height/2 - 20); }\n  if(currentStep === 4) { ctx.fillStyle = '#10b981'; ctx.fillText('ACCEPTED (13204 % 4 == 0)', canvas.width/2, canvas.height/2 + 40); ctx.fillStyle = '#00E5FF'; ctx.fillText('[ 1 3 2 0 4 ]', canvas.width/2, canvas.height/2 - 20); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "sample_space_init.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Set Definitions', 'Digit D1 Evaluation', 'Subsequent Digits', 'Cardinality Result'][currentStep-1];\n  let telemetry = 'Vector Magnitude: ' + (currentStep === 4 ? 'n(S) = 96' : 'Computing Permutations');\n  drawHUD('Sample Space Combinatorics', stepDesc, telemetry);\n  let w = 80, gap = 40, cx = canvas.width/2, cy = canvas.height/2;\n  let startX = cx - (5*w + 4*gap)/2;\n  let choices = ['4', '4', '3', '2', '1'];\n  for(let i=0; i<5; i++) {\n      let x = startX + i*(w+gap);\n      ctx.strokeStyle = '#334155'; ctx.lineWidth = 2; ctx.strokeRect(x, cy-40, w, w);\n      ctx.fillStyle = '#fff'; ctx.font = '24px monospace'; ctx.textAlign = 'center'; ctx.fillText('D' + (i+1), x + w/2, cy - 60);\n      if(currentStep >= 2 && i === 0) { ctx.fillStyle = '#f43f5e'; ctx.font = '36px monospace'; ctx.fillText(choices[i], x + w/2, cy + 10); }\n      if(currentStep >= 3 && i > 0) { ctx.fillStyle = '#00E5FF'; ctx.font = '36px monospace'; ctx.fillText(choices[i], x + w/2, cy + 10); }\n  }\n  if(currentStep >= 4) { ctx.fillStyle = '#10b981'; ctx.fillText('Total Sample Space n(S) = 4 * 4! = 96', cx, cy + 120); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "divisibility_suffix.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Generating P(5,2)', 'Modulo 4 Filter', 'Isolating Truth Matrix', 'Final Set E'][currentStep-1];\n  let telemetry = 'Constraint: [D4 * 10 + D5] Mod 4 = 0';\n  drawHUD('Divisibility Constraint Analysis', stepDesc, telemetry);\n  let valid = ['04', '12', '20', '24', '32', '40'];\n  let pairs = ['01','02','03','04','10','12','13','14','20','21','23','24','30','31','32','34','40','41','42','43'];\n  let cx = canvas.width/2, cy = canvas.height/2;\n  let cols = 5, w = 60, h = 40, xOff = cx - (cols*w)/2 - 80, yOff = cy - 120;\n  for(let i=0; i<pairs.length; i++) {\n      let r = Math.floor(i/cols), c = i%cols, px = xOff + c*(w+20), py = yOff + r*(h+20);\n      let isValid = valid.includes(pairs[i]);\n      ctx.fillStyle = '#1e293b'; ctx.strokeStyle = '#334155';\n      if(currentStep >= 2 && isValid) ctx.strokeStyle = '#10b981';\n      if(currentStep >= 2 && !isValid) ctx.strokeStyle = '#f43f5e';\n      if(currentStep >= 3 && !isValid) ctx.globalAlpha = 0.2;\n      ctx.lineWidth = 2; ctx.strokeRect(px, py, w, h); ctx.fillRect(px, py, w, h);\n      ctx.fillStyle = (currentStep >= 2 && isValid) ? '#10b981' : '#fff';\n      ctx.font = '20px monospace'; ctx.textAlign = 'center'; ctx.fillText(pairs[i], px + w/2, py + h/2 + 6);\n      ctx.globalAlpha = 1.0;\n  }\n  if(currentStep >= 4) { ctx.fillStyle = '#00E5FF'; ctx.font = '24px monospace'; ctx.fillText('Event Suffix Subset = {04, 12, 20, 24, 32, 40}', cx, cy + 180); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "partition_group_a.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Set A Defined', 'Prefix Availability', 'Permutation Map', 'Group Cardinality'][currentStep-1];\n  let telemetry = 'Set A: Suffixes containing zero {04, 20, 40}';\n  drawHUD('Case Analysis: Group A', stepDesc, telemetry);\n  let cx = canvas.width/2, cy = canvas.height/2;\n  ctx.fillStyle = '#fff'; ctx.font = '24px monospace'; ctx.textAlign = 'left'; ctx.fillText('Target Format: [ D1 ] [ D2 ] [ D3 ] [ 0 ] [ 4 ]', cx - 280, cy - 80);\n  if (currentStep >= 2) { ctx.fillStyle = '#00E5FF'; ctx.fillText('Choices:          3      2      1', cx - 280, cy - 20); ctx.fillStyle = '#10b981'; ctx.font = '18px monospace'; ctx.fillText('Zero is consumed. D1 can be any of the 3 remaining digits.', cx - 280, cy + 30); }\n  if (currentStep >= 3) { ctx.fillStyle = '#fbbf24'; ctx.font = '28px monospace'; ctx.fillText('Permutations per suffix = 3! = 6', cx - 280, cy + 90); }\n  if (currentStep >= 4) { ctx.fillStyle = '#f43f5e'; ctx.font = '32px monospace'; ctx.fillText('n(E_A) = 3 suffixes * 6 = 18', cx - 280, cy + 150); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "partition_group_b.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Set B Defined', 'Prefix Availability', 'Permutation Map', 'Group Cardinality'][currentStep-1];\n  let telemetry = 'Set B: Suffixes missing zero {12, 24, 32}';\n  drawHUD('Case Analysis: Group B', stepDesc, telemetry);\n  let cx = canvas.width/2, cy = canvas.height/2;\n  ctx.fillStyle = '#fff'; ctx.font = '24px monospace'; ctx.textAlign = 'left'; ctx.fillText('Target Format: [ D1 ] [ D2 ] [ D3 ] [ 1 ] [ 2 ]', cx - 280, cy - 80);\n  if (currentStep >= 2) { ctx.fillStyle = '#00E5FF'; ctx.fillText('Choices:          2      2      1', cx - 280, cy - 20); ctx.fillStyle = '#10b981'; ctx.font = '18px monospace'; ctx.fillText('Zero is available, but D1 != 0. Thus D1 has only 2 choices.', cx - 280, cy + 30); }\n  if (currentStep >= 3) { ctx.fillStyle = '#fbbf24'; ctx.font = '28px monospace'; ctx.fillText('Permutations per suffix = 2 * 2! = 4', cx - 280, cy + 90); }\n  if (currentStep >= 4) { ctx.fillStyle = '#f43f5e'; ctx.font = '32px monospace'; ctx.fillText('n(E_B) = 3 suffixes * 4 = 12', cx - 280, cy + 150); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "probability_aggregator.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Disjoint Union', 'Numerator & Denominator', 'Ratio Plotting', 'Final Result'][currentStep-1];\n  let telemetry = 'Probability P(E) = n(E) / n(S)';\n  drawHUD('Aggregating Favorable Sets', stepDesc, telemetry);\n  let cx = canvas.width/2, cy = canvas.height/2;\n  if(currentStep >= 1) { ctx.fillStyle = '#00E5FF'; ctx.font = '24px monospace'; ctx.textAlign = 'center'; ctx.fillText('n(E) = n(E_A) + n(E_B) = 18 + 12 = 30', cx, cy - 100); }\n  if(currentStep >= 2) { ctx.fillStyle = '#f43f5e'; ctx.fillText('n(S) = 96', cx, cy - 40); }\n  if(currentStep >= 3) { let angle = (30/96)*2*Math.PI; ctx.beginPath(); ctx.moveTo(cx, cy + 100); ctx.arc(cx, cy + 100, 80, -Math.PI/2, -Math.PI/2 + angle); ctx.closePath(); ctx.fillStyle = '#10b981'; ctx.fill(); ctx.beginPath(); ctx.moveTo(cx, cy + 100); ctx.arc(cx, cy + 100, 80, -Math.PI/2 + angle, 1.5*Math.PI); ctx.closePath(); ctx.fillStyle = '#334155'; ctx.fill(); }\n  if(currentStep >= 4) { ctx.fillStyle = '#fbbf24'; ctx.font = '40px monospace'; ctx.fillText('P(E) = 30 / 96 = 5 / 16', cx, cy + 240); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "simulation_suffix.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Pair Vector Space', 'Applying Modulus', 'Vector Subspace', 'Transformation Map'][currentStep-1];\n  let telemetry = 'Vector Transform T: R2 -> N mod 4';\n  drawHUD('Simulation: Suffix Modulo Mapping', stepDesc, telemetry);\n  let cx = canvas.width/2, cy = canvas.height/2;\n  ctx.fillStyle = '#fff'; ctx.font = '20px monospace'; ctx.textAlign = 'center';\n  if(currentStep >= 1) { ctx.fillText('Input Vector Space: V = {(x,y) | x,y in {0,1,2,3,4}, x!=y}', cx, cy - 100); }\n  if(currentStep >= 2) { ctx.fillStyle = '#00E5FF'; ctx.fillText('Transform T(v) = 10x + y (mod 4)', cx, cy - 40); }\n  if(currentStep >= 3) { ctx.fillStyle = '#fbbf24'; ctx.fillText('Kernel K = {v in V | T(v) = 0}', cx, cy + 20); }\n  if(currentStep >= 4) { ctx.fillStyle = '#10b981'; ctx.font = '28px monospace'; ctx.fillText('K = {04, 12, 20, 24, 32, 40}', cx, cy + 100); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "simulation_tree_a.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Root Node', 'Layer 1 (D1)', 'Layer 2 (D2)', 'Leaves'][currentStep-1];\n  let telemetry = 'Symmetric Prefix Tree for [D1 D2 D3 0 4]';\n  drawHUD('Symmetric Tree: Group A', stepDesc, telemetry);\n  let cx = canvas.width/2;\n  ctx.fillStyle = '#00E5FF'; ctx.font = '18px monospace'; ctx.textAlign = 'center'; ctx.fillText('[0 4]', cx, 150);\n  if(currentStep >= 2) { ctx.strokeStyle = '#334155'; ctx.beginPath(); ctx.moveTo(cx, 160); ctx.lineTo(cx - 150, 250); ctx.moveTo(cx, 160); ctx.lineTo(cx, 250); ctx.moveTo(cx, 160); ctx.lineTo(cx + 150, 250); ctx.stroke(); ctx.fillStyle = '#10b981'; ctx.fillText('D1 (3 ways)', cx - 150, 270); ctx.fillText('D1 (3 ways)', cx, 270); ctx.fillText('D1 (3 ways)', cx + 150, 270); }\n  if(currentStep >= 3) { ctx.fillStyle = '#fbbf24'; ctx.fillText('...branches 2 ways each...', cx, 350); }\n  if(currentStep >= 4) { ctx.fillStyle = '#f43f5e'; ctx.font = '24px monospace'; ctx.fillText('6 Unique Branches for each Root Suffix', cx, 450); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "simulation_tree_b.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Root Node', 'Layer 1 (D1)', 'Constraint Pruning', 'Leaves'][currentStep-1];\n  let telemetry = 'Asymmetric Prefix Tree for [D1 D2 D3 1 2]';\n  drawHUD('Asymmetric Tree: Group B', stepDesc, telemetry);\n  let cx = canvas.width/2;\n  ctx.fillStyle = '#00E5FF'; ctx.font = '18px monospace'; ctx.textAlign = 'center'; ctx.fillText('[1 2]', cx, 150);\n  if(currentStep >= 2) { ctx.strokeStyle = '#334155'; ctx.beginPath(); ctx.moveTo(cx, 160); ctx.lineTo(cx - 150, 250); ctx.moveTo(cx, 160); ctx.lineTo(cx, 250); ctx.moveTo(cx, 160); ctx.lineTo(cx + 150, 250); ctx.stroke(); ctx.fillStyle = '#10b981'; ctx.fillText('D1=0', cx - 150, 270); ctx.fillText('D1!=0', cx, 270); ctx.fillText('D1!=0', cx + 150, 270); }\n  if(currentStep >= 3) { ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx - 170, 260); ctx.lineTo(cx - 130, 280); ctx.stroke(); ctx.fillStyle = '#fbbf24'; ctx.fillText('Branch pruned by constraint D1 != 0', cx, 350); }\n  if(currentStep >= 4) { ctx.fillStyle = '#f43f5e'; ctx.font = '24px monospace'; ctx.fillText('Only 4 Unique Branches for each Root Suffix', cx, 450); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "complexity_analysis.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n<style>body { margin: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; } canvas { display: block; width: 100vw; height: 100vh; }</style>\n</head>\n<body>\n<canvas id='stage' width='800' height='600'></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nlet startX, startY, startTime;\nwindow.addEventListener('resize', resize);\nfunction resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; draw(); }\nresize();\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } draw(); } });\nfunction drawHUD(title, stepDesc, telemetry) { ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText(title, 20, 30); ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace'; ctx.fillText('Step ' + currentStep + '/' + maxSteps + ': ' + stepDesc, 20, 55); ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; ctx.fillText(telemetry, 20, 80); ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Tap]', 20, canvas.height - 20); }\nfunction draw() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  let stepDesc = ['Axes Definition', 'Brute Force Curve', 'Analytical Curve', 'Conclusion'][currentStep-1];\n  let telemetry = 'Algorithmic Complexity Chart';\n  drawHUD('Computational Complexity Mapping', stepDesc, telemetry);\n  let cx = canvas.width/2, cy = canvas.height/2 + 100;\n  ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx - 200, cy); ctx.lineTo(cx + 250, cy); ctx.moveTo(cx - 200, cy); ctx.lineTo(cx - 200, cy - 300); ctx.stroke();\n  ctx.fillStyle = '#64748b'; ctx.font = '16px monospace'; ctx.textAlign = 'center'; ctx.fillText('N (Digits)', cx + 200, cy + 20);\n  ctx.save(); ctx.translate(cx - 220, cy - 150); ctx.rotate(-Math.PI/2); ctx.fillText('Operations', 0, 0); ctx.restore();\n  if (currentStep >= 2) { ctx.strokeStyle = '#f43f5e'; ctx.beginPath(); ctx.moveTo(cx - 200, cy); for(let x=0; x<200; x+=10) { ctx.lineTo(cx - 200 + x*2, cy - Math.pow(x/20, 3)*5); } ctx.stroke(); ctx.fillStyle = '#f43f5e'; ctx.fillText('Brute Force: O(N!)', cx + 100, cy - 250); }\n  if (currentStep >= 3) { ctx.strokeStyle = '#10b981'; ctx.beginPath(); ctx.moveTo(cx - 200, cy - 20); ctx.lineTo(cx + 250, cy - 20); ctx.stroke(); ctx.fillStyle = '#10b981'; ctx.fillText('Analytical Math: O(1)', cx + 100, cy - 40); }\n  if (currentStep >= 4) { ctx.fillStyle = '#00E5FF'; ctx.font = '24px monospace'; ctx.fillText('Math derivations eliminate O(N!) cryptographic bottlenecks.', cx, cy - 350); }\n}\ndraw();\n</script>\n</body>\n</html>"
+    }
+  ]
+}

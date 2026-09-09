@@ -363,3 +363,44 @@ body, html {
     border-left: none !important;
     border-right: 2px solid rgba(0, 229, 255, 0.6) !important;
 }
+/* Hide the closed-state media strip indicator when the drawer is open */
+.media-strip.open {
+    display: none !important;
+}
+/* ---------------------------------------------------
+   SLEEK EDGE SWIPE LINE (REPLACES BUTTON)
+--------------------------------------------------- */
+
+/* 1. Completely destroy the old button if any old cached versions try to load it */
+.drawer-toggle-btn {
+    display: none !important;
+}
+
+/* 2. Style the media-strip to act as the glowing vertical line */
+.media-strip {
+    position: absolute !important;
+    top: 2cm !important;
+    height: calc(100% - 4cm) !important;
+    width: 2px !important;
+    background-color: rgba(0, 229, 255, 0.6) !important; /* Cinematic Cyan */
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.8) !important; /* Edge glow effect */
+    z-index: 10 !important;
+    transition: opacity 0.4s ease !important;
+}
+
+/* 3. Lock line to the correct edge based on the active layout */
+.slide-container.layout-split_left_theory .media-strip {
+    right: 0px !important;
+    left: auto !important;
+}
+
+.slide-container.layout-split_right_theory .media-strip {
+    left: 0px !important;
+    right: auto !important;
+}
+
+/* 4. Smoothly fade the line out when the panel opens */
+.media-strip.open {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

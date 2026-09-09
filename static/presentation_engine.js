@@ -54,12 +54,14 @@ function renderSlide() {
     if (prevMediaSrc !== currentMediaSrc) {
         if (window.cachedMediaPanel) {
             window.cachedMediaPanel.remove();
-            window.cachedToggleBtn.remove();
+            if (window.cachedToggleBtn) window.cachedToggleBtn.remove(); // Safely remove if migrating
             window.cachedMediaStrip.remove();
+            if (window.cachedSideSwipeZone) window.cachedSideSwipeZone.remove();
         }
         window.cachedMediaPanel = null;
         window.cachedToggleBtn = null;
         window.cachedMediaStrip = null;
+        window.cachedSideSwipeZone = null;
         window.cachedUiState = 0;
     }
     window.cachedSlideIndex = currentSlideIndex;
@@ -181,22 +183,12 @@ function renderSlide() {
     }
 
     if (mediaItems.length > 0) {
+        const currentLayout = slide.layout || 'split_left_theory';
+        const isFullTheory = (currentLayout === 'full_theory');
+
+        // --- 1. CREATE DOM ELEMENTS (IF NEW) ---
         if (!window.cachedMediaPanel) {
             window.cachedUiState = 0; 
-            
-            const toggleBtn = document.createElement('button');
-            toggleBtn.className = "drawer-toggle-btn";
-            
-            // Initial closed state based on layout side
-            if (slide.layout === 'split_right_theory') {
-                toggleBtn.innerHTML = "▶";
-                toggleBtn.style.left = "0";
-                toggleBtn.style.right = "auto";
-            } else {
-                toggleBtn.innerHTML = "◀";
-                toggleBtn.style.right = "0";
-                toggleBtn.style.left = "auto";
-            }
             
             const mediaStrip = document.createElement('div');
             mediaStrip.className = "media-strip";
@@ -208,142 +200,224 @@ function renderSlide() {
             resizer.className = "drawer-resizer";
             previewPanel.appendChild(resizer);
 
+            // Create Invisible Swipe Zone
+            const sideSwipeZone = document.createElement('div');
+            sideSwipeZone.className = "side-swipe-zone";
+            sideSwipeZone.style.position = "absolute";
+            sideSwipeZone.style.top = "0";
+            sideSwipeZone.style.width = "50px";
+            sideSwipeZone.style.height = "100%";
+            sideSwipeZone.style.zIndex = "1000";
+            sideSwipeZone.style.touchAction = "none";
+
             loadMediaPreview(mediaItems[0], previewPanel, targetSyncTime);
-
-            toggleBtn.onclick = (e) => {
-                e.stopPropagation(); 
-                
-                // --- FULL WIDTH MEDIA INTERCEPT ---
-                if (slide.layout === 'full_media') {
-                    // 1. Lock current 100% width in pixels so the transition has a starting point
-                    let startWidth = previewPanel.getBoundingClientRect().width;
-                    previewPanel.style.width = `${startWidth}px`;
-                    previewPanel.style.minWidth = `${startWidth}px`;
-                    
-                    // 2. Change layout to Media Left / Theory Right
-                    slide.layout = 'split_right_theory';
-                    container.className = 'slide-container layout-split_right_theory';
-                    
-                    // 3. FORCE BROWSER REFLOW: This tells the CSS engine to register the new class and starting pixels
-                    void previewPanel.offsetWidth;
-                    
-                    // 4. Calculate the target split width
-                    let splitRatio = parseFloat(slide.partition);
-                    if (isNaN(splitRatio) || splitRatio >= 0.9) splitRatio = 0.5; 
-                    let targetPreviewWidth = (container.getBoundingClientRect().width - 100) * (1 - splitRatio);
-                    
-                    // 5. Update the CSS styles for relative flexbox positioning
-                    previewPanel.style.position = 'relative';
-                    previewPanel.style.height = 'calc(100% - 4cm)';
-                    previewPanel.style.margin = '2cm 0';
-                    
-                    // 6. ANIMATE: Execute the shrink animation on the very next browser frame
-                    requestAnimationFrame(() => {
-                        previewPanel.style.width = `${targetPreviewWidth}px`;
-                        previewPanel.style.minWidth = `${targetPreviewWidth}px`; 
-                        
-                        // Snap button to the inner seam and update icon
-                        toggleBtn.innerHTML = "◀";
-                        toggleBtn.style.left = `${targetPreviewWidth + 50}px`;
-                        toggleBtn.style.right = "auto";
-                    });
-                    
-                    // 7. Sync the JS memory state to 'open' so subsequent clicks collapse it naturally
-                    window.cachedUiState = 2;
-                    
-                    return; // Stop standard toggle execution
-                }
-
-                if (window.cachedUiState === 0) {
-                    window.cachedUiState = 2; 
-                    
-                    let targetPreviewWidth;
-                    if ((slide.layout === 'overlay_glass' || slide.layout === 'full_media')) {
-                        targetPreviewWidth = container.getBoundingClientRect().width;
-                        previewPanel.style.position = 'absolute';
-                        previewPanel.style.top = '0';
-                        previewPanel.style.left = '0';
-                        previewPanel.style.height = '100%';
-                        previewPanel.style.margin = '0';
-                        previewPanel.style.zIndex = '1';
-                    } else {
-                        let splitRatio = parseFloat(slide.partition);
-                        if (isNaN(splitRatio) || splitRatio >= 0.9) splitRatio = 0.5; 
-                        targetPreviewWidth = (container.getBoundingClientRect().width - 100) * (1 - splitRatio);
-                    }
-                    
-                    previewPanel.classList.add('open');
-                    previewPanel.style.width = `${targetPreviewWidth}px`;
-                    previewPanel.style.minWidth = `${targetPreviewWidth}px`; 
-                    
-                    // Attach button to the correct active edge
-                    if (slide.layout === 'split_right_theory') {
-                        toggleBtn.innerHTML = "◀";
-                        toggleBtn.style.left = `${targetPreviewWidth + 50}px`;
-                        toggleBtn.style.right = "auto";
-                    } else {
-                        toggleBtn.innerHTML = "▶";
-                        toggleBtn.style.right = (slide.layout === 'overlay_glass' || slide.layout === 'full_media') ? '0px' : `${targetPreviewWidth + 50}px`;
-                        toggleBtn.style.left = "auto";
-                    }
-                } else {
-                    window.cachedUiState = 0; 
-                    mediaStrip.classList.remove('open');
-                    previewPanel.classList.remove('open');
-                    previewPanel.style.width = "0px";
-                    previewPanel.style.minWidth = "0px";
-                    
-                    // Revert button to closed edge
-                    if (slide.layout === 'split_right_theory') {
-                        toggleBtn.innerHTML = "▶";
-                        toggleBtn.style.left = "0";
-                        toggleBtn.style.right = "auto";
-                    } else {
-                        toggleBtn.innerHTML = "◀";
-                        toggleBtn.style.right = "0";
-                        toggleBtn.style.left = "auto";
-                    }
-                    
-                    const activeMedia = previewPanel.querySelector('.media-embed');
-                    if (activeMedia) {
-                        if (activeMedia.tagName === 'VIDEO') {
-                            activeMedia.pause();
-                        } else if (activeMedia.tagName === 'IFRAME' && activeMedia.src.includes('youtube.com')) {
-                            activeMedia.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                        }
-                    }
-                }
-            };
-
-            resizer.addEventListener('pointerdown', (e) => {
-                if (window.cachedUiState !== 2) return;
-                e.stopPropagation();
-                window.__isResizing = true;
-                document.body.style.cursor = 'col-resize';
-                previewPanel.style.transition = 'none';
-            });
-
-            window.cachedMediaPanel = previewPanel;
-            window.cachedToggleBtn = toggleBtn;
-            window.cachedMediaStrip = mediaStrip;
             
+            window.cachedMediaPanel = previewPanel;
+            window.cachedMediaStrip = mediaStrip;
+            window.cachedSideSwipeZone = sideSwipeZone;
+
             container.appendChild(window.cachedMediaPanel);
             container.appendChild(window.cachedMediaStrip);
-            container.appendChild(window.cachedToggleBtn);
+            container.appendChild(window.cachedSideSwipeZone);
+
+            // --- Gesture Logic for Edge Swipe ---
+            let startY = 0;
+            let startTime = 0;
+            let isSwiping = false;
+
+            sideSwipeZone.addEventListener('pointerdown', (e) => {
+                isSwiping = true;
+                startY = e.clientY;
+                startTime = Date.now();
+                try { sideSwipeZone.setPointerCapture(e.pointerId); } catch(err) {}
+            });
+
+            sideSwipeZone.addEventListener('pointerup', (e) => {
+                if (!isSwiping) return;
+                isSwiping = false;
+                try { sideSwipeZone.releasePointerCapture(e.pointerId); } catch(err) {}
+
+                let deltaY = e.clientY - startY;
+                let deltaTime = Date.now() - startTime;
+                
+                // Swipe down threshold: > 40px in < 400ms
+                if (deltaY > 40 && deltaTime < 400) {
+                    togglePanelLayout();
+                }
+            });
+
+            // Laptop fallback: double click the edge
+            sideSwipeZone.addEventListener('dblclick', () => {
+                togglePanelLayout();
+            });
         }
 
+        // --- Position the Swipe Zone & Visual Line based on Layout ---
+        
+        // 1. Purge messy styles to let your beautiful CSS define the exact look
+        window.cachedMediaStrip.removeAttribute('style');
+        window.cachedSideSwipeZone.removeAttribute('style');
+
+        // 2. Restore basic invisible swipe zone dimensions
+        window.cachedSideSwipeZone.style.top = "0";
+        window.cachedSideSwipeZone.style.width = "50px";
+        window.cachedSideSwipeZone.style.height = "100%";
+        window.cachedSideSwipeZone.style.zIndex = "1000";
+        window.cachedSideSwipeZone.style.touchAction = "none";
+
+        // 3. Smart Anchor Positioning (The Core Fix)
+        if (currentLayout === 'split_right_theory') {
+            // Media Left: Use absolute positioning (anchors perfectly right next to your sidebar)
+            window.cachedSideSwipeZone.style.setProperty('position', 'absolute', 'important');
+            window.cachedSideSwipeZone.style.setProperty('left', '0px', 'important');
+            window.cachedSideSwipeZone.style.setProperty('right', 'auto', 'important');
+            
+            window.cachedMediaStrip.style.setProperty('position', 'absolute', 'important');
+            window.cachedMediaStrip.style.setProperty('left', '0px', 'important');
+            window.cachedMediaStrip.style.setProperty('right', 'auto', 'important');
+        } else {
+            // Media Right: Use fixed positioning (anchors directly to the physical monitor edge, escaping container overflow!)
+            window.cachedSideSwipeZone.style.setProperty('position', 'fixed', 'important');
+            window.cachedSideSwipeZone.style.setProperty('right', '0px', 'important');
+            window.cachedSideSwipeZone.style.setProperty('left', 'auto', 'important');
+            
+            window.cachedMediaStrip.style.setProperty('position', 'fixed', 'important');
+            window.cachedMediaStrip.style.setProperty('right', '0px', 'important'); 
+            window.cachedMediaStrip.style.setProperty('left', 'auto', 'important');
+        }
+
+        // --- 2. Calculate Dimensions ---
+        let containerWidth = container.getBoundingClientRect().width;
+        if (containerWidth === 0) containerWidth = window.innerWidth;
+        
+        let splitRatio = parseFloat(slide.partition);
+        if (isNaN(splitRatio) || splitRatio >= 0.9) splitRatio = 0.5; 
+        
+        let targetPreviewWidth = (containerWidth - 100) * (1 - splitRatio);
+        if (currentLayout === 'overlay_glass' || currentLayout === 'full_media') {
+            targetPreviewWidth = containerWidth;
+        }
+
+        // Helper to instantly snap UI to Open or Closed state flawlessly
+        function snapPanelState(isOpen) {
+            window.cachedMediaPanel.style.transition = 'none';
+
+            if (isOpen) {
+                window.cachedUiState = 2;
+                window.cachedMediaPanel.classList.add('open');
+                window.cachedMediaStrip.classList.add('open');
+                
+                if (currentLayout === 'overlay_glass' || currentLayout === 'full_media') {
+                    window.cachedMediaPanel.style.position = 'absolute';
+                    window.cachedMediaPanel.style.top = '0';
+                    window.cachedMediaPanel.style.left = '0';
+                    window.cachedMediaPanel.style.height = '100%';
+                    window.cachedMediaPanel.style.margin = '0';
+                    window.cachedMediaPanel.style.zIndex = '1';
+                } else {
+                    window.cachedMediaPanel.style.position = 'relative';
+                    window.cachedMediaPanel.style.height = 'calc(100% - 4cm)';
+                    window.cachedMediaPanel.style.margin = '2cm 0';
+                }
+                
+                window.cachedMediaPanel.style.width = `${targetPreviewWidth}px`;
+                window.cachedMediaPanel.style.minWidth = `${targetPreviewWidth}px`; 
+            } else {
+                window.cachedUiState = 0;
+                window.cachedMediaPanel.classList.remove('open');
+                window.cachedMediaStrip.classList.remove('open');
+                window.cachedMediaPanel.style.width = "0px";
+                window.cachedMediaPanel.style.minWidth = "0px";
+            }
+
+            void window.cachedMediaPanel.offsetHeight;
+            window.cachedMediaPanel.style.transition = '';
+        }
+
+        // --- 3. Enforce Layout on Load ---
+        snapPanelState(!isFullTheory);
+
+        // --- 4. Dynamic Toggle Logic ---
+        function togglePanelLayout() {
+            // Full Width Media Intercept
+            if (slide.layout === 'full_media') {
+                let startWidth = window.cachedMediaPanel.getBoundingClientRect().width;
+                window.cachedMediaPanel.style.width = `${startWidth}px`;
+                window.cachedMediaPanel.style.minWidth = `${startWidth}px`;
+                
+                slide.layout = 'split_right_theory';
+                container.className = 'slide-container layout-split_right_theory';
+                
+                void window.cachedMediaPanel.offsetHeight; 
+                
+                let newTargetWidth = (container.getBoundingClientRect().width - 100) * (1 - splitRatio);
+                window.cachedMediaPanel.style.position = 'relative';
+                window.cachedMediaPanel.style.height = 'calc(100% - 4cm)';
+                window.cachedMediaPanel.style.margin = '2cm 0';
+                
+                requestAnimationFrame(() => {
+                    window.cachedMediaPanel.style.width = `${newTargetWidth}px`;
+                    window.cachedMediaPanel.style.minWidth = `${newTargetWidth}px`; 
+                });
+                
+                // Keep swipe zone attached to edge
+                window.cachedSideSwipeZone.style.left = "0";
+                window.cachedSideSwipeZone.style.right = "auto";
+                
+                window.cachedUiState = 2;
+                return; 
+            }
+
+            // Standard Open/Close Toggle
+            if (window.cachedUiState === 0) {
+                window.cachedUiState = 2;
+                window.cachedMediaPanel.classList.add('open');
+                window.cachedMediaStrip.classList.add('open');
+                
+                if (currentLayout === 'overlay_glass' || currentLayout === 'full_media') {
+                    window.cachedMediaPanel.style.position = 'absolute';
+                    window.cachedMediaPanel.style.top = '0';
+                    window.cachedMediaPanel.style.left = '0';
+                    window.cachedMediaPanel.style.height = '100%';
+                    window.cachedMediaPanel.style.margin = '0';
+                    window.cachedMediaPanel.style.zIndex = '1';
+                } else {
+                    window.cachedMediaPanel.style.position = 'relative';
+                    window.cachedMediaPanel.style.height = 'calc(100% - 4cm)';
+                    window.cachedMediaPanel.style.margin = '2cm 0';
+                }
+                
+                window.cachedMediaPanel.style.width = `${targetPreviewWidth}px`;
+                window.cachedMediaPanel.style.minWidth = `${targetPreviewWidth}px`; 
+            } else {
+                window.cachedUiState = 0;
+                window.cachedMediaPanel.classList.remove('open');
+                window.cachedMediaStrip.classList.remove('open');
+                window.cachedMediaPanel.style.width = "0px";
+                window.cachedMediaPanel.style.minWidth = "0px";
+            }
+        }
+
+        // --- 5. Drag Resizer Logic ---
         if (!window.__resizerBound) {
             window.__resizerBound = true;
+            document.addEventListener('pointerdown', (e) => {
+                if (e.target.classList.contains('drawer-resizer') && window.cachedUiState === 2) {
+                    e.stopPropagation();
+                    window.__isResizing = true;
+                    document.body.style.cursor = 'col-resize';
+                    window.cachedMediaPanel.style.transition = 'none';
+                }
+            });
+
             document.addEventListener('pointermove', (e) => {
-                const activePanel = document.querySelector('.media-preview-panel.open');
-                if (!window.__isResizing || !activePanel) return;
+                if (!window.__isResizing || !window.cachedMediaPanel.classList.contains('open')) return;
                 
                 const containerRect = document.getElementById('slideContainer').getBoundingClientRect();
-                const currentLayout = currentDeck.slides[currentSlideIndex].layout;
+                const activeLayout = currentDeck.slides[currentSlideIndex].layout || 'split_left_theory';
                 let newWidth;
                 
-                // Calculate drag distance from the correct side of the screen
-                if (currentLayout === 'split_right_theory') {
+                if (activeLayout === 'split_right_theory') {
                     newWidth = e.clientX - containerRect.left - 50;
                 } else {
                     newWidth = containerRect.right - e.clientX - 50;
@@ -352,64 +426,20 @@ function renderSlide() {
                 if (newWidth < 300) newWidth = 300;
                 if (newWidth > containerRect.width * 0.8) newWidth = containerRect.width * 0.8;
                 
-                activePanel.style.width = `${newWidth}px`;
-                activePanel.style.minWidth = `${newWidth}px`; 
-                
-                // Keep button attached to the active dragging edge
-                const toggleBtn = document.querySelector('.drawer-toggle-btn');
-                if (currentLayout === 'split_right_theory') {
-                    toggleBtn.style.left = `${newWidth + 50}px`;
-                    toggleBtn.style.right = "auto";
-                } else {
-                    toggleBtn.style.right = `${newWidth + 50}px`;
-                    toggleBtn.style.left = "auto";
-                }
+                window.cachedMediaPanel.style.width = `${newWidth}px`;
+                window.cachedMediaPanel.style.minWidth = `${newWidth}px`; 
             });
 
             document.addEventListener('pointerup', () => {
                 if (window.__isResizing) {
                     window.__isResizing = false;
                     document.body.style.cursor = 'default';
-                    const activePanel = document.querySelector('.media-preview-panel.open');
-                    if (activePanel) activePanel.style.transition = 'width 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
+                    if (window.cachedMediaPanel) window.cachedMediaPanel.style.transition = '';
                 }
             });
         }
 
-        // Layout Persistence (When AI swaps layouts between slides)
-        if (window.cachedUiState === 2 && window.cachedMediaPanel) {
-            let targetPreviewWidth;
-            if ((slide.layout === 'overlay_glass' || slide.layout === 'full_media')) {
-                targetPreviewWidth = container.getBoundingClientRect().width;
-                window.cachedMediaPanel.style.position = 'absolute';
-                window.cachedMediaPanel.style.top = '0';
-                window.cachedMediaPanel.style.left = '0';
-                window.cachedMediaPanel.style.height = '100%';
-                window.cachedMediaPanel.style.margin = '0';
-                window.cachedMediaPanel.style.zIndex = '1';
-            } else {
-                let splitRatio = parseFloat(slide.partition);
-                if (isNaN(splitRatio) || splitRatio >= 0.9) splitRatio = 0.5; 
-                targetPreviewWidth = (container.getBoundingClientRect().width - 100) * (1 - splitRatio);
-                window.cachedMediaPanel.style.position = 'relative';
-                window.cachedMediaPanel.style.height = 'calc(100% - 4cm)';
-                window.cachedMediaPanel.style.margin = '2cm 0';
-            }
-            window.cachedMediaPanel.style.width = `${targetPreviewWidth}px`;
-            window.cachedMediaPanel.style.minWidth = `${targetPreviewWidth}px`; 
-            
-            // Maintain button position across slides
-            if (slide.layout === 'split_right_theory') {
-                window.cachedToggleBtn.innerHTML = "◀";
-                window.cachedToggleBtn.style.left = `${targetPreviewWidth + 50}px`;
-                window.cachedToggleBtn.style.right = "auto";
-            } else {
-                window.cachedToggleBtn.innerHTML = "▶";
-                window.cachedToggleBtn.style.right = (slide.layout === 'overlay_glass' || slide.layout === 'full_media') ? '0px' : `${targetPreviewWidth + 50}px`;
-                window.cachedToggleBtn.style.left = "auto";
-            }
-        }
-
+        // --- 6. Sync Video Timeline ---
         if (targetSyncTime !== null && window.cachedUiState === 2) {
             const activeVid = window.cachedMediaPanel.querySelector('video');
             if (activeVid) {
@@ -423,9 +453,11 @@ function renderSlide() {
                 }
             }
         }
-    }
+    } // Ends if (mediaItems.length > 0)
+    
+    // Finally, build the sidebar using the currently loaded deck data
     buildSidebarNav();
-}
+} // Ends renderSlide() function
 
 function buildSidebarNav() {
     const list = document.getElementById('slideNavList');
@@ -696,7 +728,7 @@ window.addEventListener('click', (e) => {
     if (e.target.closest('.media-drawer') || 
         e.target.closest('.media-strip') ||
         e.target.closest('.media-preview-panel') ||
-        e.target.closest('.drawer-toggle-btn') || 
+        e.target.closest('.side-swipe-zone') || 
         e.target.closest('.floating-blackboard') ||
         e.target.closest('.slide-nav-drawer')) {
         return;

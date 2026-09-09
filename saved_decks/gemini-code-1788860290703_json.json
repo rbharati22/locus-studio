@@ -1,0 +1,359 @@
+{
+  "project_title": "Module 1: Probability - Foundations & Event Spaces",
+  "subject": "Applied Mathematics",
+  "author": "Prof. Locus AI Studio",
+  "theme": "locus_cinematic",
+  "slides": [
+    {
+      "id": "slide_01_hook",
+      "title": "Deterministic vs. Random Experiments",
+      "subtitle": "Predictability in Physical Systems",
+      "layout": "split_right_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "An **experiment** is any procedure that can be infinitely repeated with a well-defined set of possible outcomes.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Deterministic Experiments:** The outcome is exactly predictable if initial conditions are known.",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "s = ut + \\frac{1}{2}gt^2",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Random (Stochastic) Experiments:** Exact outcome cannot be predicted with certainty, even under identical conditions (e.g., tossing a coin).",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "deterministic_vs_stochastic.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_02_sample_space",
+      "title": "The Sample Space",
+      "subtitle": "Defining the Universe of Outcomes",
+      "layout": "full_media",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "The first step in analyzing a random experiment is listing everything that could possibly happen.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "callout",
+          "content": "**Sample Space ($S$ or $\\Omega$):** The set of all possible outcomes of a random experiment.",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "Consider tossing a coin three times. We can visualize the sequential outcomes using a **Tree Diagram**.",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "S = \\{HHH, HHT, HTH, HTT, THH, THT, TTH, TTT\\}",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "coin_tree_diagram.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_03_grid_diagram",
+      "title": "Grid Diagrams",
+      "subtitle": "Visualizing Multi-Dimensional Spaces",
+      "layout": "full_media",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "When dealing with pairs of independent events (like rolling two dice), a **Grid Diagram** is the optimal visualization tool.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Die 1 forms the x-axis ($1$ through $6$).",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Die 2 forms the y-axis ($1$ through $6$).",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "|S| = 6 \\times 6 = 36 \\text{ total outcomes}",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "dice_grid_diagram.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_04_events",
+      "title": "Events as Subsets",
+      "subtitle": "Isolating Specific Conditions",
+      "layout": "split_left_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "An **Event** ($E$ or $A$) is a subset of the sample space ($E \\subseteq S$). It represents a specific collection of outcomes satisfying a condition.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "Let Event $A$ be: \"The sum of the two dice is exactly 7.\"",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "A = \\{(1,6), (2,5), (3,4), (4,3), (5,2), (6,1)\\}",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "text",
+          "content": "Visually, this forms a strict diagonal subset across our grid.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "dice_event_subset.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_05_venn_diagrams",
+      "title": "Venn Diagrams & Set Operations",
+      "subtitle": "Unions and Intersections",
+      "layout": "full_theory",
+      "partition": 0.45,
+      "theory_fragments": [
+        {
+          "type": "text",
+          "content": "For a single 6-sided die, the sample space is $S = \\{1,2,3,4,5,6\\}$.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Let Event $B$ = \"Roll is Even\" = $\\{2,4,6\\}$",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "Let Event $C$ = \"Roll is greater than 3\" = $\\{4,5,6\\}$",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "math",
+          "content": "B \\cap C = \\{4,6\\}",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "web_widget",
+        "src": "venn_diagram_events.html",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": true,
+        "controls": true
+      },
+      "speaker_notes": ""
+    },
+    {
+      "id": "slide_06_summary",
+      "title": "Core Foundations Summary",
+      "subtitle": "The Building Blocks of Probability",
+      "layout": "full_theory",
+      "partition": 1.0,
+      "theory_fragments": [
+        {
+          "type": "bullet",
+          "content": "**Deterministic vs Stochastic:** Known physics ($s=ut+\\frac{1}{2}gt^2$) vs unknown precise outcomes.",
+          "highlight": false,
+          "reveal_step": 1,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Sample Space ($\\Omega$ or $S$):** The absolute set of all mutually exclusive primitive outcomes.",
+          "highlight": false,
+          "reveal_step": 2,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Events ($E \\subseteq S$):** Subsets that isolate targeted conditions (e.g., Sum = 7).",
+          "highlight": false,
+          "reveal_step": 3,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        },
+        {
+          "type": "bullet",
+          "content": "**Set Operations:** We leverage Unions ($A \\cup B$) and Intersections ($A \\cap B$) to compute complex overlapping probabilities.",
+          "highlight": false,
+          "reveal_step": 4,
+          "label": null,
+          "clear_screen": false,
+          "video_sync_time": null
+        }
+      ],
+      "media_panel": {
+        "media_type": "none",
+        "src": "",
+        "caption": null,
+        "graph_formula": null,
+        "autoplay": false,
+        "controls": false
+      },
+      "speaker_notes": ""
+    }
+  ],
+  "media_scripts": [
+    {
+      "filename": "deterministic_vs_stochastic.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>\n  body { margin: 0; padding: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh; }\n  canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 4/3; background: #0f172a; }\n</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nfunction advanceToStep(step) { \n    currentStep = Math.max(1, Math.min(maxSteps, step));\n    time = 0;\n    particles = [];\n    if(currentStep === 4) {\n        for(let i=0; i<100; i++) particles.push(createParticle());\n    }\n}\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } advanceToStep(currentStep); } });\n\nlet time = 0;\nlet particles = [];\nfunction createParticle() {\n    return { x: 400, y: 150, vx: (Math.random() - 0.5) * 8, vy: Math.random() * 2 };\n}\n\nfunction animate() {\n    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n    \n    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;\n    ctx.beginPath(); ctx.moveTo(400, 150); ctx.lineTo(400, 500); ctx.stroke();\n    ctx.beginPath(); ctx.moveTo(200, 500); ctx.lineTo(600, 500); ctx.stroke();\n    \n    if (currentStep === 1 || currentStep === 2) {\n        let y = 150 + 0.5 * 9.8 * (time * time) * 0.05;\n        if (y > 490) y = 490;\n        ctx.fillStyle = '#00E5FF';\n        ctx.beginPath(); ctx.arc(400, y, 10, 0, Math.PI*2); ctx.fill();\n    }\n    \n    if (currentStep === 3) {\n        let y = 150 + 0.5 * 9.8 * (time * time) * 0.05;\n        let x = 400;\n        if (y > 490) {\n            y = 490;\n            x = 400 + Math.sin(time) * 100; // Random scatter visualization\n        }\n        ctx.fillStyle = '#10b981';\n        ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI*2); ctx.fill();\n    }\n    \n    if (currentStep === 4) {\n        particles.forEach(p => {\n            p.vy += 0.2;\n            p.x += p.vx;\n            p.y += p.vy;\n            if (p.y > 495) {\n                p.y = 495;\n                p.vy *= -0.5;\n                p.vx *= 0.8;\n            }\n            ctx.fillStyle = '#fbbf24';\n            ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();\n        });\n    }\n    \n    time += 0.5;\n    \n    ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText('Experiment Models', 20, 30);\n    ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace';\n    const desc = ['Initial Setup: Fixed Object', 'Deterministic: Exact Physical Path Known', 'Stochastic: Unknown Final Scatter State', 'Distribution of Multiple Random Trials'][currentStep-1];\n    ctx.fillText(`Step ${currentStep}/${maxSteps}: ${desc}`, 20, 55);\n    ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; \n    ctx.fillText(`Telemetry: Time T=${time.toFixed(1)} | Model: ${currentStep < 3 ? 'Classical Physics' : 'Probability'}`, 20, 80);\n    ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n    requestAnimationFrame(animate);\n}\nanimate();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "coin_tree_diagram.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>\n  body { margin: 0; padding: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh; }\n  canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 4/3; background: #0f172a; }\n</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nfunction advanceToStep(step) { currentStep = Math.max(1, Math.min(maxSteps, step)); }\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } advanceToStep(currentStep); } });\n\nfunction drawNode(x, y, label, color) {\n    ctx.beginPath(); ctx.arc(x, y, 15, 0, Math.PI*2);\n    ctx.fillStyle = color; ctx.fill();\n    ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2; ctx.stroke();\n    ctx.fillStyle = '#0f172a'; ctx.font = '14px monospace';\n    ctx.fillText(label, x-4, y+4);\n}\n\nfunction drawLine(x1, y1, x2, y2) {\n    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);\n    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2; ctx.stroke();\n}\n\nfunction animate() {\n    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n    \n    const rootX = 100, rootY = 300;\n    drawNode(rootX, rootY, 'S', '#00E5FF');\n    \n    if (currentStep >= 2) {\n        drawLine(rootX, rootY, 250, 200); drawNode(250, 200, 'H', '#10b981');\n        drawLine(rootX, rootY, 250, 400); drawNode(250, 400, 'T', '#f43f5e');\n    }\n    if (currentStep >= 3) {\n        drawLine(250, 200, 400, 150); drawNode(400, 150, 'H', '#10b981');\n        drawLine(250, 200, 400, 250); drawNode(400, 250, 'T', '#f43f5e');\n        drawLine(250, 400, 400, 350); drawNode(400, 350, 'H', '#10b981');\n        drawLine(250, 400, 400, 450); drawNode(400, 450, 'T', '#f43f5e');\n    }\n    if (currentStep >= 4) {\n        const ys = [120, 180, 220, 280, 320, 380, 420, 480];\n        const labels = ['H','T','H','T','H','T','H','T'];\n        const outcomes = ['HHH','HHT','HTH','HTT','THH','THT','TTH','TTT'];\n        for(let i=0; i<8; i++) {\n            let px = 400, py = (i<4) ? (i<2 ? 150 : 250) : (i<6 ? 350 : 450);\n            drawLine(px, py, 550, ys[i]); drawNode(550, ys[i], labels[i], labels[i]==='H'?'#10b981':'#f43f5e');\n            ctx.fillStyle = '#fbbf24'; ctx.fillText(outcomes[i], 580, ys[i]+4);\n        }\n    }\n\n    ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText('Sequential Sample Space (Tree Diagram)', 20, 30);\n    ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace';\n    const desc = ['Initial State (0 Flips)', 'First Coin Flip (2 Outcomes)', 'Second Coin Flip (4 Outcomes)', 'Third Coin Flip (8 Outcomes, |S| = 8)'][currentStep-1];\n    ctx.fillText(`Step ${currentStep}/${maxSteps}: ${desc}`, 20, 55);\n    ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; \n    ctx.fillText(`Telemetry: 2^${currentStep-1} Branches Active`, 20, 80);\n    ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n    requestAnimationFrame(animate);\n}\nanimate();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "dice_grid_diagram.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>\n  body { margin: 0; padding: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh; }\n  canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 4/3; background: #0f172a; }\n</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nfunction advanceToStep(step) { currentStep = Math.max(1, Math.min(maxSteps, step)); }\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } advanceToStep(currentStep); } });\n\nfunction animate() {\n    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n    \n    const ox = 250, oy = 450, spacing = 50;\n    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;\n    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox + 350, oy); ctx.stroke();\n    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox, oy - 350); ctx.stroke();\n    \n    ctx.fillStyle = '#64748b'; ctx.font = '14px monospace';\n    ctx.fillText('Die 1 (x)', ox + 360, oy + 5);\n    ctx.fillText('Die 2 (y)', ox - 30, oy - 360);\n    \n    for(let i=1; i<=6; i++) {\n        ctx.fillText(i, ox + i*spacing - 4, oy + 20);\n        ctx.fillText(i, ox - 20, oy - i*spacing + 4);\n    }\n    \n    if (currentStep >= 2) {\n        for(let x=1; x<=6; x++) {\n            for(let y=1; y<=6; y++) {\n                ctx.beginPath(); ctx.arc(ox + x*spacing, oy - y*spacing, 4, 0, Math.PI*2);\n                ctx.fillStyle = '#00E5FF'; ctx.fill();\n            }\n        }\n    }\n    \n    if (currentStep >= 3) {\n        ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';\n        ctx.beginPath(); ctx.arc(ox + 3.5*spacing, oy - 3.5*spacing, 180, 0, Math.PI*2); ctx.fill();\n        ctx.strokeStyle = '#10b981'; ctx.beginPath(); ctx.arc(ox + 3.5*spacing, oy - 3.5*spacing, 180, 0, Math.PI*2); ctx.stroke();\n        ctx.fillStyle = '#10b981'; ctx.fillText('Full Sample Space |S| = 36', 420, 150);\n    }\n    \n    if (currentStep >= 4) {\n        for(let x=1; x<=6; x++) {\n            for(let y=1; y<=6; y++) {\n                ctx.fillStyle = '#ffffff'; ctx.font = '10px monospace';\n                ctx.fillText(`(${x},${y})`, ox + x*spacing + 6, oy - y*spacing - 6);\n            }\n        }\n    }\n\n    ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText('Multi-Dimensional Grid (2 Dice)', 20, 30);\n    ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace';\n    const desc = ['Coordinate Axes Setup', 'Plotting Primitive Outcomes', 'Defining the Bounding Sample Space', 'Labeling Ordered Pairs (x, y)'][currentStep-1];\n    ctx.fillText(`Step ${currentStep}/${maxSteps}: ${desc}`, 20, 55);\n    ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; \n    ctx.fillText(`Telemetry: Total Dimensions = 2 | Outcomes = 36`, 20, 80);\n    ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n    requestAnimationFrame(animate);\n}\nanimate();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "dice_event_subset.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>\n  body { margin: 0; padding: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh; }\n  canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 4/3; background: #0f172a; }\n</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nfunction advanceToStep(step) { currentStep = Math.max(1, Math.min(maxSteps, step)); }\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } advanceToStep(currentStep); } });\n\nfunction animate() {\n    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n    \n    const ox = 250, oy = 450, spacing = 50;\n    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;\n    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox + 350, oy); ctx.stroke();\n    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox, oy - 350); ctx.stroke();\n    \n    for(let i=1; i<=6; i++) {\n        ctx.fillStyle = '#64748b';\n        ctx.fillText(i, ox + i*spacing - 4, oy + 20);\n        ctx.fillText(i, ox - 20, oy - i*spacing + 4);\n    }\n    \n    for(let x=1; x<=6; x++) {\n        for(let y=1; y<=6; y++) {\n            let isTarget = (x+y === 7) && currentStep >= 3;\n            let color = isTarget ? '#fbbf24' : '#00E5FF';\n            ctx.beginPath(); ctx.arc(ox + x*spacing, oy - y*spacing, isTarget ? 8 : 4, 0, Math.PI*2);\n            ctx.fillStyle = color; ctx.fill();\n            if(isTarget) {\n                ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 2; ctx.stroke();\n            }\n        }\n    }\n    \n    if (currentStep >= 4) {\n        ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)'; ctx.lineWidth = 20;\n        ctx.beginPath(); ctx.moveTo(ox + spacing, oy - 6*spacing); ctx.lineTo(ox + 6*spacing, oy - spacing); ctx.stroke();\n        ctx.fillStyle = '#fbbf24'; ctx.font = '16px monospace';\n        ctx.fillText('Subset E: Sum = 7', 480, 160);\n    }\n\n    ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText('Events as Subsets in Sample Space', 20, 30);\n    ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace';\n    const desc = ['Base Sample Space S', 'Define Condition: x + y = 7', 'Isolate Specific Coordinates', 'Highlight Diagonal Subset Matrix'][currentStep-1];\n    ctx.fillText(`Step ${currentStep}/${maxSteps}: ${desc}`, 20, 55);\n    ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; \n    ctx.fillText(`Telemetry: |S| = 36 | |E| = ${currentStep >= 3 ? 6 : 0}`, 20, 80);\n    ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n    requestAnimationFrame(animate);\n}\nanimate();\n</script>\n</body>\n</html>"
+    },
+    {
+      "filename": "venn_diagram_events.html",
+      "script_type": "html_canvas",
+      "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>\n  body { margin: 0; padding: 0; background: #0f172a; overflow: hidden; font-family: monospace; user-select: none; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh; }\n  canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 4/3; background: #0f172a; }\n</style>\n</head>\n<body>\n<canvas id=\"stage\" width=\"800\" height=\"600\"></canvas>\n<script>\nconst canvas = document.getElementById('stage');\nconst ctx = canvas.getContext('2d');\nlet currentStep = 1; const maxSteps = 4;\nfunction advanceToStep(step) { currentStep = Math.max(1, Math.min(maxSteps, step)); }\nlet startX, startY, startTime;\nwindow.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; startTime = Date.now(); });\nwindow.addEventListener('pointerup', e => { if (Math.abs(e.clientX - startX) < 15 && Math.abs(e.clientY - startY) < 15 && Date.now() - startTime < 350) { if (e.clientX < window.innerWidth / 3) { currentStep = Math.max(1, currentStep - 1); } else { currentStep = Math.min(maxSteps, currentStep + 1); } advanceToStep(currentStep); } });\n\nfunction animate() {\n    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 800, 600);\n    \n    // Universe S\n    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;\n    ctx.strokeRect(200, 150, 400, 300);\n    ctx.fillStyle = '#64748b'; ctx.font = '16px monospace'; ctx.fillText('Sample Space S', 210, 175);\n    \n    ctx.fillText('1', 250, 400);\n    ctx.fillText('3', 550, 400);\n\n    const cx1 = 340, cy1 = 300, r = 90;\n    const cx2 = 460, cy2 = 300;\n    \n    if (currentStep >= 2) {\n        ctx.fillStyle = 'rgba(0, 229, 255, 0.2)'; ctx.beginPath(); ctx.arc(cx1, cy1, r, 0, Math.PI*2); ctx.fill();\n        ctx.strokeStyle = '#00E5FF'; ctx.stroke();\n        ctx.fillStyle = '#00E5FF'; ctx.fillText('Event B', 280, 240);\n        ctx.fillText('2', 300, 300);\n    }\n    \n    if (currentStep >= 3) {\n        ctx.fillStyle = 'rgba(16, 185, 129, 0.2)'; ctx.beginPath(); ctx.arc(cx2, cy2, r, 0, Math.PI*2); ctx.fill();\n        ctx.strokeStyle = '#10b981'; ctx.stroke();\n        ctx.fillStyle = '#10b981'; ctx.fillText('Event C', 450, 240);\n        ctx.fillText('5', 500, 300);\n    }\n    \n    if (currentStep >= 4) {\n        ctx.save();\n        ctx.beginPath(); ctx.arc(cx1, cy1, r, 0, Math.PI*2); ctx.clip();\n        ctx.beginPath(); ctx.arc(cx2, cy2, r, 0, Math.PI*2);\n        ctx.fillStyle = 'rgba(251, 191, 36, 0.6)'; ctx.fill();\n        ctx.restore();\n        ctx.fillStyle = '#fbbf24'; ctx.fillText('4', 400, 280); ctx.fillText('6', 400, 320);\n        ctx.fillText('B \\u2229 C', 380, 210);\n    }\n\n    ctx.fillStyle = '#00E5FF'; ctx.font = '16px monospace'; ctx.fillText('Set Theory: Venn Diagrams', 20, 30);\n    ctx.fillStyle = '#fbbf24'; ctx.font = '14px monospace';\n    const desc = ['Universal Set (Die Roll 1 to 6)', 'Event B: Even Rolls {2, 4, 6}', 'Event C: Greater than 3 {4, 5, 6}', 'Intersection: Even AND >3 {4, 6}'][currentStep-1];\n    ctx.fillText(`Step ${currentStep}/${maxSteps}: ${desc}`, 20, 55);\n    ctx.fillStyle = '#10b981'; ctx.font = '14px monospace'; \n    ctx.fillText(`Telemetry: Topology Mode Active`, 20, 80);\n    ctx.fillStyle = '#64748b'; ctx.font = '12px monospace'; ctx.fillText('Click Left: Prev Step | Click Right: Next Step | [Interaction: Drag/Orbit/Translate]', 20, 580);\n    requestAnimationFrame(animate);\n}\nanimate();\n</script>\n</body>\n</html>"
+    }
+  ]
+}
